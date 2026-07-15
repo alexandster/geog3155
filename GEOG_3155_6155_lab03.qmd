@@ -1,8 +1,8 @@
 ---
-title: "GEOG 5160 6160 Lab 03"
+title: "GEOG 3155 6155 Lab 03"
 author: 
-  - name: "Simon Brewer"
-    email: simon.brewer@ess.utah.edu
+  - name: "Alexander Hohl"
+    email: alexander.hohl@ess.utah.edu
     affiliations:
       - name: University of Utah
         address: 260 S Central Campus Drive
@@ -27,22 +27,22 @@ set.seed(42)
 
 In this lab, we’ll look at how to implement a range of tree methods including basic classification and regression trees, random forests and boosted regression trees. We will also look at how to predict for new data and how to carry out hyperparameter tuning.
 
-We’ll illustrate these methods by using them to build a species distribution model for the pinon pine in the western United States. You will need the following datasets from Canvas, so download these to your datafiles folder (extract any zip files). Make a new folder for today’s class called lab07 and move these files to it (you'll need to unzip one of them):
+We’ll illustrate these methods by using them to build a species distribution model for the pinon pine in the western United States. You will need the following datasets from Canvas, so download these to your datafiles folder (extract any zip files). Make a new folder for today’s class called lab03 and move these files to it (you'll need to unzip one of them):
 
--   *pe_df.csv*
--   *ne_50m_admin_0_countries.zip*
--   *current.env.nc*
--   *future.env.nc*
+- *pe_df.csv*
+- *ne_50m_admin_0_countries.zip*
+- *current.env.nc*
+- *future.env.nc*
 
 You will need to make sure the following packages are installed on your computer (in addition to the packages we have used in previous labs).
 
--   **terra**: working with raster data
--   **sf**: working with spatial data
--   **tmap**: making thematic maps
--   **tree**: simple classification and regression trees
--   **rpart.plot**: better CART graphics
--   **vip**: better variable importance plots
--   **pdp**: partial dependency plots
+- **terra**: working with raster data
+- **sf**: working with spatial data
+- **tmap**: making thematic maps
+- **tree**: simple classification and regression trees
+- **rpart.plot**: better CART graphics
+- **vip**: better variable importance plots
+- **pdp**: partial dependency plots
 
 As a reminder, packages can be installed in RStudio by going to the 'Packages' tab and clicking on the \[Install\] button, or from the menu \[Tools\]-\> \[Install packages...\]. You can also install these from the console window by typing
 
@@ -52,13 +52,19 @@ install.packages("terra")
 
 ## Objectives
 
--   Understand how to set use functions to train, test and examine tree-based models
--   Use a validation dataset to tune model hyperparameters
--   Make and visualize predictions
+- Understand how to set use functions to train, test and examine tree-based models
+- Use a validation dataset to tune model hyperparameters
+- Make and visualize predictions
 
 **It is highly recommended to use scripts or Quarto documents to store your R code - this will allow you to easily change and modify it and submit the exercise.**
 
-Next load the libraries you will need for the lab. You should at this stage have most of these already installed. Add anything that is not installed using the `install.packages()` function.
+Next load the libraries you will need for the lab. You should at this stage have most of these already installed. Add anything that is not installed using the `install.packages()` function. Note that the `vip` package needs to be installed from archive as follows:
+
+```{r message=FALSE}
+url <- "https://cran.r-project.org/src/contrib/Archive/vip/vip_0.4.6.tar.gz"
+pkgFile <- "vip_0.4.6.tar.gz"
+download.file(url = url, destfile = pkgFile)
+```
 
 ```{r message=FALSE}
 library(tidyverse)
@@ -194,10 +200,10 @@ tree$args
 
 Tuning with tidymodels requries a series of steps:
 
--   Define the tuning *specification*
--   Define the tuning grid
--   Define a strategy for validation (i.e. validating different combinations of hyperparameter values)
--   Run the tuning and explore the outcomes
+- Define the tuning *specification*
+- Define the tuning grid
+- Define a strategy for validation (i.e. validating different combinations of hyperparameter values)
+- Run the tuning and explore the outcomes
 
 The goal of the tuning specification is to define which of the hyperparameters we want to tune. In **tidymodels**, we use the algorithm function (here: `decision_tree`) to set these. Here, we'll tune the minimum number of samples to split a node (`min_n`) and the depth of the tree (the maximum number of splits in a single branch). Rather than set these to given value, we set them to the `tune()` function - essentially a placeholder to indicate that they will be tuned. In addition, we define the engine and mode of the tree.
 
@@ -240,11 +246,11 @@ dat_folds <- vfold_cv(dat_train2, v = 5)
 
 With all that set up, we can now run the tuning. There's a fair amount going on here, so let's step through it. The function to run the tuning is called `tune_grid`, and we use the following arguments
 
--   The tuning specification `tune_spec`
--   A formula defining the target and features (`pa ~ .`, where the `.` indicates using all other variables as features)
--   The grid of hyperparameter values to test
--   The metrics to be calculated for each fold and each combination of hyperparameters
--   
+- The tuning specification `tune_spec`
+- A formula defining the target and features (`pa ~ .`, where the `.` indicates using all other variables as features)
+- The grid of hyperparameter values to test
+- The metrics to be calculated for each fold and each combination of hyperparameters
+- 
 
 ```{r}
 tree_res <- 
@@ -340,9 +346,9 @@ rf$args
 
 We'll now set up the tuning strategy. This will follow the same steps as above, but with a difference in the hyperparameters. We'll tune
 
--   `mtry`: the number of features used for split in a tree in the forest
--   `trees`: the number of trees in the forest
--   `min_n`: the minimum number of samples for splitting
+- `mtry`: the number of features used for split in a tree in the forest
+- `trees`: the number of trees in the forest
+- `min_n`: the minimum number of samples for splitting
 
 Note that unlike the example above, where we used the default ranges for each hyperparameter, we manually set these while making the tuning grid using the `range` argument. Again, we'll use 5 levels for each giving us $5 \times 5 \times 5 = 125$ combinations, which will be evaluated with a 5-fold cross-validation (a total of 625 random forests)
 
@@ -409,7 +415,7 @@ best_param
 
 Now, let's make a final model with these values, and evaluate with the test set:
 
--   Accuracy
+- Accuracy
 
 ```{r}
 rf_final <- finalize_model(tune_spec_rf, best_param)
@@ -423,7 +429,7 @@ pred_test |>
   accuracy(pa, .pred_class)
 ```
 
--   AUC
+- AUC
 
 ```{r}
 pred_test <- predict(rf_fit, dat_test2, type='prob') |>
@@ -476,7 +482,7 @@ We will now build a gradient boosted tree model for the Pinus data. In contrast 
 
 With the exception of the different hyperparameters, the code follows the examples above. This is, hopefully, where using the **tidymodels** approach starts to shine - if you want to change algorithms, you can reuse and modify existing code easily.
 
--   First get the hyperparameter list
+- First get the hyperparameter list
 
 ```{r}
 gbt = boost_tree() |> 
@@ -486,7 +492,7 @@ gbt = boost_tree() |>
 gbt$args
 ```
 
--   Set up tuning specification
+- Set up tuning specification
 
 ```{r}
 tune_spec_gbt <- 
@@ -499,7 +505,7 @@ tune_spec_gbt <-
   set_mode("classification")
 ```
 
--   Set up tuning grid
+- Set up tuning grid
 
 ```{r}
 gbt_grid <- grid_regular(learn_rate(),
@@ -509,13 +515,13 @@ gbt_grid <- grid_regular(learn_rate(),
 gbt_grid
 ```
 
--   Validation strategy
+- Validation strategy
 
 ```{r}
 dat_folds <- vfold_cv(dat_train2, v = 5)
 ```
 
--   Run tuning
+- Run tuning
 
 ```{r}
 gbt_res <- 
@@ -531,19 +537,19 @@ gbt_res <-
 gbt_res
 ```
 
--   Summarize
+- Summarize
 
 ```{r}
 collect_metrics(gbt_res)
 ```
 
--   Plot (note the impact of the learning rate)
+- Plot (note the impact of the learning rate)
 
 ```{r}
 autoplot(gbt_res)
 ```
 
--   Pick best parameters and train final model
+- Pick best parameters and train final model
 
 ```{r}
 best_param <- select_best(gbt_res, metric = "accuracy") 
@@ -551,7 +557,7 @@ gbt_final <- finalize_model(tune_spec_gbt, best_param)
 gbt_fit <- fit(gbt_final, pa ~ ., dat_train2)
 ```
 
--   Evaluate (accuracy)
+- Evaluate (accuracy)
 
 ```{r}
 pred_test <- predict(gbt_fit, dat_test2) |>
@@ -560,7 +566,7 @@ pred_test |>
   accuracy(pa, .pred_class)
 ```
 
--   Evaluate (AUC)
+- Evaluate (AUC)
 
 ```{r}
 pred_test <- predict(rf_fit, dat_test2, type='prob') |>
@@ -692,9 +698,9 @@ plot(ne_geom, add = TRUE)
 
 As a final result, we can use the two binary maps to more easily visualize how the distribution of suitable areas is projected to change. By subtracting the current binary distribution from the future binary distribution, we end up with a map with three values:
 
--   1: new areas of suitability
--   0: No change
--   -1: loss of suitability
+- 1: new areas of suitability
+- 0: No change
+- -1: loss of suitability
 
 ```{r}
 plot(future_pa - curr_pa)
@@ -705,34 +711,34 @@ plot(ne_geom, add = TRUE)
 
 For the exercise, you will need to submit two things:
 
--   A table listing the AUC and accuracy for the three different algorithms (decision trees, random forest and boosted regression). You should give these values based on predictions for the *test* dataset using the final model.
--   A map showing predicted *probability* of Pinus edulis presence under *current* environmental conditions using *either* the decision tree model or the boosted regression
+- A table listing the AUC and accuracy for the three different algorithms (decision trees, random forest and boosted regression). You should give these values based on predictions for the *test* dataset using the final model.
+- A map showing predicted *probability* of Pinus edulis presence under *current* environmental conditions using *either* the decision tree model or the boosted regression
 
-Students enrolled in 6160 should also provide
+Students enrolled in 6155 should also provide
 
--   A map showing predicted *probability* of Pinus edulis presence under *future* environmental conditions using the same model as in part 2
--   A map showing the difference between the future and current predicted presence for the same model
+- A map showing predicted *probability* of Pinus edulis presence under *future* environmental conditions using the same model as in part 2
+- A map showing the difference between the future and current predicted presence for the same model
 
-Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and (ideally) the compiled HTML file, should be submitted to Canvas by Feb 12th. Please use the following naming convention: `Lab03_lastname`.
+Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and (ideally) the compiled HTML file, should be submitted to Canvas. Please use the following naming convention: `Lab03_lastname`.
 
 # Appendix 1: Bioclimate variables
 
--   BIO1 = Annual Mean Temperature
--   BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))
--   BIO3 = Isothermality (BIO2/BIO7) (\* 100)
--   BIO4 = Temperature Seasonality (standard deviation \*100)
--   BIO5 = Max Temperature of Warmest Month
--   BIO6 = Min Temperature of Coldest Month
--   BIO7 = Temperature Annual Range (BIO5-BIO6)
--   BIO8 = Mean Temperature of Wettest Quarter
--   BIO9 = Mean Temperature of Driest Quarter
--   BIO10 = Mean Temperature of Warmest Quarter
--   BIO11 = Mean Temperature of Coldest Quarter
--   BIO12 = Annual Precipitation
--   BIO13 = Precipitation of Wettest Month
--   BIO14 = Precipitation of Driest Month
--   BIO15 = Precipitation Seasonality (Coefficient of Variation)
--   BIO16 = Precipitation of Wettest Quarter
--   BIO17 = Precipitation of Driest Quarter
--   BIO18 = Precipitation of Warmest Quarter
--   BIO19 = Precipitation of Coldest Quarter
+- BIO1 = Annual Mean Temperature
+- BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))
+- BIO3 = Isothermality (BIO2/BIO7) (\* 100)
+- BIO4 = Temperature Seasonality (standard deviation \*100)
+- BIO5 = Max Temperature of Warmest Month
+- BIO6 = Min Temperature of Coldest Month
+- BIO7 = Temperature Annual Range (BIO5-BIO6)
+- BIO8 = Mean Temperature of Wettest Quarter
+- BIO9 = Mean Temperature of Driest Quarter
+- BIO10 = Mean Temperature of Warmest Quarter
+- BIO11 = Mean Temperature of Coldest Quarter
+- BIO12 = Annual Precipitation
+- BIO13 = Precipitation of Wettest Month
+- BIO14 = Precipitation of Driest Month
+- BIO15 = Precipitation Seasonality (Coefficient of Variation)
+- BIO16 = Precipitation of Wettest Quarter
+- BIO17 = Precipitation of Driest Quarter
+- BIO18 = Precipitation of Warmest Quarter
+- BIO19 = Precipitation of Coldest Quarter

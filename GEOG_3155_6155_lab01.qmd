@@ -1,8 +1,8 @@
 ---
-title: "GEOG 5160 6160 Lab 01"
+title: "GEOG 3155 6155 Lab 01"
 author: 
-  - name: "Simon Brewer"
-    email: simon.brewer@ess.utah.edu
+  - name: "Alexander Hohl"
+    email: alexander.hohl@ess.utah.edu
     affiliations:
       - name: University of Utah
         address: 260 S Central Campus Drive
@@ -21,7 +21,7 @@ editor: source
 
 In this lab, we will introduce the basic functionality of R, together with some simple plotting functions. We will be using the following files for these examples:
 
--   A dataset of morphological measurements of three species of penguin from the file *penguins.csv*
+- A dataset of morphological measurements of three species of penguin from the file *penguins.csv*
 
 More information about this dataset can be found here: <https://allisonhorst.github.io/palmerpenguins/index.html>
 
@@ -45,17 +45,17 @@ The R Studio interface consists of several windows. Start R Studio from the 'Sta
 
 ![RStudio Interface](./images/rstudio.png)
 
--   *Bottom left*: console window (also called command window). Here you can type simple commands after the `>` prompt and R will then execute your command. This is the most important window, because this is where R actually does stuff.
--   *Top left*: editor window (also called script window). Collections of commands (scripts) can be edited and saved. When you don't see this window, you can open it with \[File $>$ New $>$ R script\]. Just typing a command in the editor window is not enough, it has to get into the command window before R executes the command. If you want to run a line from the script window (or the whole script), copy and paste it to the console. Alternatively, you can click \[Run\] or press CTRL+ENTER to send it to the command window.
--   *Top right*: workspace / history window. In the workspace window you can see which data and values R has in its memory. You can view and edit the values by clicking on them. The history window shows what has been typed before.
--   *Bottom right*: Files / plots / packages / help window. Here you can open files, view plots (also previous plots), install and load packages or use the help function. You can change the size of the windows by dragging the grey bars between the windows.
+- *Bottom left*: console window (also called command window). Here you can type simple commands after the `>` prompt and R will then execute your command. This is the most important window, because this is where R actually does stuff.
+- *Top left*: editor window (also called script window). Collections of commands (scripts) can be edited and saved. When you don't see this window, you can open it with \[File $>$ New $>$ R script\]. Just typing a command in the editor window is not enough, it has to get into the command window before R executes the command. If you want to run a line from the script window (or the whole script), copy and paste it to the console. Alternatively, you can click \[Run\] or press CTRL+ENTER to send it to the command window.
+- *Top right*: workspace / history window. In the workspace window you can see which data and values R has in its memory. You can view and edit the values by clicking on them. The history window shows what has been typed before.
+- *Bottom right*: Files / plots / packages / help window. Here you can open files, view plots (also previous plots), install and load packages or use the help function. You can change the size of the windows by dragging the grey bars between the windows.
 
 ### Working with R
 
 Much of your time spent with R will involve typing commands in at the console, and R Studio has some help with this.
 
--   The up/down arrow keys allow you to cycle back through commands that have been previously entered. You can then modify or reuse these as necessary. The commands can also be accessed through the \`History' tab in the top-right panel
--   The console has 'tab-completion', which allows you to enter the first few characters of a string or function name, press 'Tab', and R Studio will bring up a list of possible options that match the string you entered. Try typing `pri` and pressing 'Tab' - you should see `print` as part of the list, and you can click on this, or scroll down to use it from the list.
+- The up/down arrow keys allow you to cycle back through commands that have been previously entered. You can then modify or reuse these as necessary. The commands can also be accessed through the \`History' tab in the top-right panel
+- The console has 'tab-completion', which allows you to enter the first few characters of a string or function name, press 'Tab', and R Studio will bring up a list of possible options that match the string you entered. Try typing `pri` and pressing 'Tab' - you should see `print` as part of the list, and you can click on this, or scroll down to use it from the list.
 
 ### Workspace
 
@@ -68,7 +68,7 @@ R defines the working directory as the folder in which it is currently working. 
 For this class, the labs will assume that you have your files organized according to the following structure:
 
 ```         
-+-- geog6160
++-- geog6155
 |   +-- datafiles
 |   +-- lab01
 |   +-- lab02
@@ -83,20 +83,20 @@ Once you have created these folders, we need to change R's working directory so 
 
 You can also change the working directory manually using the `setwd()` function in the console. To do this, you may need to know the full path to the folder on your computer. If you followed the instructions given above, this should be:
 
--   On a Windows system: `C:/Users/username/Documents/geog6160/lab01`
--   On a Mac OSX system: `/Users/username/Documents/geog6160/lab01`
+- On a Windows system: `C:/Users/username/Documents/geog6155/lab01`
+- On a Mac OSX system: `/Users/username/Documents/geog6155/lab01`
 
 Where `username` is your name on the computer. You can also find this path by
 
--   On a Windows system: `- Use the File Explorer to select the folder`lab01\`
--   Right-click the folder and select 'Properties'
--   In the pop-up window, the path will be listed under 'Location'
--   Highlight this, and copy the path
--   On a Mac OSX system:
--   Use the Finder app to select the folder `lab01`
--   Go to the "View" menu then "Show Path Bar". THis will make the full path appear at the bottom of the Finder window
--   Right-click the Path Bar file name
--   Select "Copy as Pathname" You can now run the `setwd()` command. Go to the console window in RStudio and enter the following code:
+- On a Windows system: `- Use the File Explorer to select the folder`lab01\`
+- Right-click the folder and select 'Properties'
+- In the pop-up window, the path will be listed under 'Location'
+- Highlight this, and copy the path
+- On a Mac OSX system:
+- Use the Finder app to select the folder `lab01`
+- Go to the "View" menu then "Show Path Bar". THis will make the full path appear at the bottom of the Finder window
+- Right-click the Path Bar file name
+- Select "Copy as Pathname" You can now run the `setwd()` command. Go to the console window in RStudio and enter the following code:
 
 ```{r eval=FALSE}
 setwd("")
@@ -114,13 +114,13 @@ Note that the slashes are forward slashes and don't forget the quotations. R is 
 getwd()
 ```
 
-You can also use relative paths. If your current working directory is `geog6160` and you want to change to `lab01`, enter the following code (where the `./` changes the directory to a level higher than the current one).
+You can also use relative paths. If your current working directory is `geog6155` and you want to change to `lab01`, enter the following code (where the `./` changes the directory to a level higher than the current one).
 
 ```{r eval=FALSE}
 setwd("./lab01")
 ```
 
-If your current working directory is `lab01` and you want to change to `geog6160`, enter the following code (where the `../` changes the directory to a level below the current one).
+If your current working directory is `lab01` and you want to change to `geog6155`, enter the following code (where the `../` changes the directory to a level below the current one).
 
 ```{r eval=FALSE}
 setwd("../")
@@ -450,8 +450,8 @@ ggplot(penguin, aes(x = bill_length_mm, y = bill_depth_mm)) +
 
 Some things to note:
 
--   We define an *aesthetic* (`aes()`) which identifies the variables to be used on the x and y axes
--   We add a *geometry* to define the type of plot we want to make (a point or scatter plot)
+- We define an *aesthetic* (`aes()`) which identifies the variables to be used on the x and y axes
+- We add a *geometry* to define the type of plot we want to make (a point or scatter plot)
 
 As we know that these values come from three difference species, we can use this knowledge to add extra information to the plot, by adding a `col` argument to the aestehtic (you can also display different symbols using the `shape` argument):
 
@@ -595,10 +595,10 @@ This makes a list:
 
 Now click the \[Render\] button again. The html file will update (you may need to refresh or reopen the file to see this). You should see that the text is now formatted. As a quick overview:
 
--   Hashtags `#` indicate headers (one `#` for a main header, two for a subheader, etc)
--   Single asterixs (`*`) give emphasized text
--   Double asterixs give bold text
--   Hyphens produce lists
+- Hashtags `#` indicate headers (one `#` for a main header, two for a subheader, etc)
+- Single asterixs (`*`) give emphasized text
+- Double asterixs give bold text
+- Hyphens produce lists
 
 See [here](https://quarto.org/docs/authoring/markdown-basics.html) for more formatting options.
 
@@ -640,7 +640,7 @@ Save this and render it, and you should now see the figure appear in your output
 
 # Exercise
 
-For this lab, all you will need to do is add a second figure to your Quarto document and render it. You can choose any of the other figures introduced in this lab. You should submit the following through Canvas by January 27th:
+For this lab, all you will need to do is add a second figure to your Quarto document and render it. You can choose any of the other figures introduced in this lab. You should submit the following through Canvas:
 
--   The Quarto document
--   The rendered HTML page
+- The Quarto document
+- The rendered HTML page

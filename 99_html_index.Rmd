@@ -1,12 +1,12 @@
 ---
-title: 'GEOG 5160 6160 Spatial Data Science in Practice: Spring 2026'
+title: 'GEOG 3155 6155 Introduction to Spatial Data Science: Fall 2026'
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
   rmarkdown::render(input_file,
  encoding=encoding,
  output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
 author:
-  - Simon Brewer^[University of Utah, simon.brewer@ess.utah.edu]
+  - Alexander Hohl^[University of Utah, alexander.hohl@ess.utah.edu]
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -19,128 +19,66 @@ output:
 
 # Introduction
 
-Spatial data science is a fast-growing discipline, with wide-ranging applications, including human health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity. This class is designed to provide an introduction to the methods used to work with these data, including data acquisition and manipulation, building predictive model pipelines and spatial simulation approaches. Students taking this class will learn both the theory and practice of using these methods through a combination of lecture and hand-on computer work. Over the course of the semester, students will develop their own spatial data analytical projects, which will include the design and implementation of the project as well as the communication of results. 
+Spatial Data Science is a fast-growing discipline, with wide-ranging applications, including public health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity. 
+
+In this class, you’ll learn how to acquire and manipulate spatial data, build machine learning models, and through a combination of lecture and hands-on computer work, leave with knowledge of theory and practice relevant for jobs, research, or solving real-world problems.
+
+Over the course of the semester, you will develop your own Spatial Data Science project, which will include the design and implementation, as well as the communication of results.
+
 
 # Classes
 
 - Lab 1
-    - [Installation instructions][install]
-    - [Lab notes (R)][lab01r]
-    - [Lab notes (Python notebook)][lab01p]
-    - [Lab notes (Python colab)][lab01c]
+  - [Installation instructions](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Installation.html)
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab01.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab01.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/18oHWVeZJs-tHIkNGjsHMOtx0IVGZtlec?usp=sharing)
 - Lab 2
-    - [Lab notes (R)][lab02r]
-    - [Lab notes (Python notebook)][lab02p]
-    - [Lab notes (Python colab)][lab02c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab02.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab02.ipynb)
+  - [Lab notes (Python colab)](https://drive.google.com/file/d/1v6cTv3zA1YH7yvZHitBL5dstYRUgxOZq/view?usp=sharing)
 - Lab 3
-    - [Lab notes (R)][lab03r]
-    - [Lab notes (Python notebook)][lab03p]
-    - [Lab notes (Python colab)][lab03c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab03.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab03.ipynb)
+  - [Lab notes (Python colab)](https://drive.google.com/file/d/1SlhPrshvdMKUpi0gfmEobvlNwGuZmmec/view?usp=sharing)
 - Lab 4
-    - [Lab notes (R)][lab04r]
-    - [Lab notes (Python notebook)][lab04p]
-    - [Lab notes (Python colab)][lab04c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab04.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab04.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/11buvWJVZ3GPZasCv0wNlfqSzjLreTEQA?usp=sharing)
 - Lab 5
-    - [Lab notes (R)][lab05r]
-    - [Lab notes (Python notebook)][lab05p]
-    - [Lab notes (Python colab)][lab05c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab05.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab05.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1aQa9VsSqM9xcl7VOvRkeTQ1kKKxrJuBk?usp=sharing)
 - Lab 6
-    - [Lab notes (R)][lab06r]
-    - [Lab notes (Python notebook)][lab06p]
-    - [Lab notes (Python colab)][lab06c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab06.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab06.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1gXjnjgRxD-4X-haoWLc9G-a5MP-P96xj?usp=sharing)
 - Preprocessing lab
-    - [Lab notes (R)][labppr]
-    - [Lab notes (Python notebook)][labppp]
-    - [Lab notes (Python colab)][labppc]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Preprocessing_Examples.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_Preprocessing_Examples.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1UW5Hk2dyk_gMSTh5D7Q5_ttVHu2Kjort?usp=sharing)
 - Lab 7
-    - [Lab notes (R)][lab07r]
-    - [Lab notes (Python notebook)][lab07p]
-    - [Lab notes (Python colab)][lab07c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab07.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab07.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1Pjedvyh7aGc1NL6b1aRkUTfYRgyA0NyV?usp=sharing)
 - Lab 8
-    - [Lab notes (R)][lab08r]
-    - [Lab notes (Python notebook)][lab08p]
-    - [Lab notes (Python colab)][lab08c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab08.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab08.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1gLwg6nTJ-mtKvp3nti1gyAUk1ZQQs1ob?usp=sharing)
 - Lab 9
-    - [Lab notes (R)][lab09r]
-    - [Lab notes (Python notebook)][lab09p]
-    - [Lab notes (Python colab)][lab09c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab09.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab09.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1mw2JOBrI80qA6e4Zs-REP7BZBjiEyhFK?usp=sharing)
 - Lab 10
-    - [Lab notes (R)][lab10r]
-    - [Lab notes (Python notebook)][lab10p]
-    - [Lab notes (Python colab)][lab10c]
-- [CNN assignment][cnn_exercise]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab10.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab10.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1pIZrXAqV-YeHx_EvWx-Y6J9EO5X7F6jA?usp=sharing)
+- [CNN assignment](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_CNN_assignment_08.html)
 - Lab 11
-    - [Lab notes (R)][lab11r]
-    - [Lab notes (Python notebook)][lab11p]
-    - [Lab notes (Python colab)][lab11c]
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab11.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab11.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1EOC11JasR03aJBvDz-ohoDfftR3TPm6u?usp=sharing)
 - Lab 12
-    - [Lab notes (R)][lab12r]
-    - [Lab notes (Python notebook)][lab12p]
-    - [Lab notes (Python colab)][lab12c]
-
-    
-
-[install]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Installation.html
-[lab01r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab01.html
-[lab01p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab01.ipynb
-[lab01c]: https://colab.research.google.com/drive/18oHWVeZJs-tHIkNGjsHMOtx0IVGZtlec?usp=sharing
-[lab02r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab02.html
-[lab02p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab02.ipynb
-[lab02c]: https://drive.google.com/file/d/1v6cTv3zA1YH7yvZHitBL5dstYRUgxOZq/view?usp=sharing
-[lab03r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab03.html
-[lab03p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab03.ipynb
-[lab03c]: https://drive.google.com/file/d/1SlhPrshvdMKUpi0gfmEobvlNwGuZmmec/view?usp=sharing
-[lab04r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab04.html
-[lab04p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab04.ipynb
-[lab04c]: https://colab.research.google.com/drive/11buvWJVZ3GPZasCv0wNlfqSzjLreTEQA?usp=sharing
-[lab05r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab05.html
-[lab05p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab05.ipynb
-[lab05c]: https://colab.research.google.com/drive/1aQa9VsSqM9xcl7VOvRkeTQ1kKKxrJuBk?usp=sharing
-[lab06r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab06.html
-[lab06p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab06.ipynb
-[lab06c]: https://colab.research.google.com/drive/1gXjnjgRxD-4X-haoWLc9G-a5MP-P96xj?usp=sharing
-
-[labppr]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Preprocessing_Examples.html
-[labppp]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_Preprocessing_Examples.ipynb
-[labppc]: https://colab.research.google.com/drive/1UW5Hk2dyk_gMSTh5D7Q5_ttVHu2Kjort?usp=sharing
-
-[lab07r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab07.html
-[lab07p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab07.ipynb
-[lab07c]: https://colab.research.google.com/drive/1Pjedvyh7aGc1NL6b1aRkUTfYRgyA0NyV?usp=sharing
-[keras_install]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_keras_installation.html
-[lab08r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab08.html
-[lab08p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab08.ipynb
-[lab08c]: https://colab.research.google.com/drive/1gLwg6nTJ-mtKvp3nti1gyAUk1ZQQs1ob?usp=sharing
-[lab09r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab09.html
-[lab09p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab09.ipynb
-[lab09c]: https://colab.research.google.com/drive/1mw2JOBrI80qA6e4Zs-REP7BZBjiEyhFK?usp=sharing
-[cnn_exercise]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_CNN_assignment_08.html
-[lab10r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab10.html
-[lab10p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab10.ipynb
-[lab10c]: https://colab.research.google.com/drive/1pIZrXAqV-YeHx_EvWx-Y6J9EO5X7F6jA?usp=sharing
-[lab11r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab11.html
-[lab11p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab11.ipynb
-[lab11c]: https://colab.research.google.com/drive/1EOC11JasR03aJBvDz-ohoDfftR3TPm6u?usp=sharing
-[rnn_exercise]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_RNN_assignment_11.html
-[lab12r]: https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab12.html
-[lab12p]: https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab12.ipynb
-[lab12c]: https://colab.research.google.com/drive/1QyZTtjJmfyS2vcuPac1fUTiuZWwXcgPa?usp=sharing
-
-[penguins]: https://drive.google.com/file/d/1Sb5uv2RP_gcNJDKmlEjBoSUOdETIq2Jf/view?usp=sharing
-[housing]: https://drive.google.com/file/d/1pTBKamvTk7ZLsRIFKRNQ37_XU2J5y9XT/view?usp=sharing
-[pe_df]: https://drive.google.com/file/d/1YUML4HEX1jLgpuiODJNMrxKlru8tCKJe/view?usp=sharing
-[ne_shp]: https://drive.google.com/file/d/1IF2GT05HggO2OncDbDnp9ZF1toggj54r/view?usp=sharing
-[curr_env]: https://drive.google.com/file/d/1tuyY7VFgkXWvppMwpTxYl-34lYa_4pyL/view?usp=sharing
-[futr_env]: https://drive.google.com/file/d/1at_RvzwRTVdiFInV03hXOuvvfeo1iJjv/view?usp=sharing
-[atl_shp]: https://drive.google.com/file/d/123_jTvrCbA80Gl0GmKCmLylB5RZf-1_5/view?usp=sharing
-[cancer]: https://drive.google.com/file/d/1cgplF41EKtQ32vkDOf-y1W9lnwbAGg_u/view?usp=sharing
-[lslpts]: https://drive.google.com/file/d/1x9bZXR86J-kFxufFvmNpbrid66krbONI/view?usp=sharing
-[lsl_ta]: https://drive.google.com/file/d/1DO6eyL-N48rM-2pU4ddwMn4YFRoouYtM/view?usp=sharing
-[bike]: https://drive.google.com/file/d/1vuFJPShROaRHSc_rJrRkskTiIQONjLzk/view?usp=sharing
-[gap]: https://drive.google.com/file/d/1KKqQFDBv8Axditeo95wgRECrA9jCPchD/view?usp=sharing
-[class_data]: https://drive.google.com/file/d/1282606hbmX2UuBd6IoKpXQy9TbS3-yZ7/view?usp=sharing
-[credit_data]: https://drive.google.com/file/d/13dbnHh0VMEb8dlTf-YU6CJC4tday8L6V/view?usp=sharing
-[eurosat_rgb]: https://drive.google.com/file/d/1jxJHZkAwrlyP-YZ4vRsYS7KVltp5-4yQ/view?usp=sharing
-[unet2]: https://drive.google.com/file/d/1wURMPxE0zOUKlJaLWYBdahoI_CcUFeYa/view?usp=sharing
-[unet3]: https://drive.google.com/file/d/1MuHa6fsFUIgDo9Zg2Et_N87piz77eYbq/view?usp=sharing
-[pollution]: https://drive.google.com/file/d/1vlRn99GrDs_El_QGbXc9fw-WOBYvftTq/view?usp=sharing
+  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab12.html)
+  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab12.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1QyZTtjJmfyS2vcuPac1fUTiuZWwXcgPa?usp=sharing)

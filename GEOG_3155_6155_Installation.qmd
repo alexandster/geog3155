@@ -1,8 +1,8 @@
 ---
-title: "GEOG 5160 6160 Installation"
+title: "GEOG 3155 6155 Installation"
 author: 
-  - name: "Simon Brewer"
-    email: simon.brewer@ess.utah.edu
+  - name: "Alexander Hohl"
+    email: alexander.Hohl@ess.utah.edu
     affiliations:
       - name: University of Utah
         address: 260 S Central Campus Drive

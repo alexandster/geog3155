@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alexander Hohl">
-<meta name="dcterms.date" content="2026-07-13">
+<meta name="dcterms.date" content="2026-07-15">
 
 <title>GEOG 3155 6155 Lab 01</title>
 <style>
@@ -4244,7 +4244,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 13, 2026</p>
+      <p class="date">July 15, 2026</p>
     </div>
   </div>
   
@@ -4308,7 +4308,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="working-directory">Working directory</h3>
 <p>R defines the working directory as the folder in which it is currently working. When you ask R to open a certain file, it will look in the working directory for this file, and when you tell R to save a data file or plot, it will save it in the working directory.</p>
 <p>For this class, the labs will assume that you have your files organized according to the following structure:</p>
-<pre><code>+-- geog6160
+<pre><code>+-- geog6155
 |   +-- datafiles
 |   +-- lab01
 |   +-- lab02
@@ -4319,8 +4319,8 @@ window.Quarto = {
 <p>Once you have created these folders, we need to change R’s working directory so that it is pointing to <code>lab01</code>. The easiest way to do this is by going to the [Session] menu in RStudio, then [Change working directory]. This will open a file browser that you can use to browse through your computer and find the folder. (If you are using the base version of R, go to [File] <span class="math inline">\(&gt;\)</span> [Change dir…] in Windows, or [Misc] <span class="math inline">\(&gt;\)</span> [Change Working Directory] in Mac.)</p>
 <p>You can also change the working directory manually using the <code>setwd()</code> function in the console. To do this, you may need to know the full path to the folder on your computer. If you followed the instructions given above, this should be:</p>
 <ul>
-<li>On a Windows system: <code>C:/Users/username/Documents/geog6160/lab01</code></li>
-<li>On a Mac OSX system: <code>/Users/username/Documents/geog6160/lab01</code></li>
+<li>On a Windows system: <code>C:/Users/username/Documents/geog6155/lab01</code></li>
+<li>On a Mac OSX system: <code>/Users/username/Documents/geog6155/lab01</code></li>
 </ul>
 <p>Where <code>username</code> is your name on the computer. You can also find this path by</p>
 <ul>
@@ -4345,11 +4345,11 @@ window.Quarto = {
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>You can also use relative paths. If your current working directory is <code>geog6160</code> and you want to change to <code>lab01</code>, enter the following code (where the <code>./</code> changes the directory to a level higher than the current one).</p>
+<p>You can also use relative paths. If your current working directory is <code>geog6155</code> and you want to change to <code>lab01</code>, enter the following code (where the <code>./</code> changes the directory to a level higher than the current one).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">&quot;./lab01&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>If your current working directory is <code>lab01</code> and you want to change to <code>geog6160</code>, enter the following code (where the <code>../</code> changes the directory to a level below the current one).</p>
+<p>If your current working directory is <code>lab01</code> and you want to change to <code>geog6155</code>, enter the following code (where the <code>../</code> changes the directory to a level below the current one).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">&quot;../&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -4940,7 +4940,7 @@ This makes a list:
 </section>
 <section id="exercise" class="level1">
 <h1>Exercise</h1>
-<p>For this lab, all you will need to do is add a second figure to your Quarto document and render it. You can choose any of the other figures introduced in this lab. You should submit the following through Canvas by January 27th:</p>
+<p>For this lab, all you will need to do is add a second figure to your Quarto document and render it. You can choose any of the other figures introduced in this lab. You should submit the following through Canvas:</p>
 <ul>
 <li>The Quarto document</li>
 <li>The rendered HTML page</li>

@@ -5,3 +5,5 @@
 .Ruserdata
 ./lab10_keras/beijing/
 ./datafiles/fruits/
+/.quarto/
+**/*.quarto_ipynb
