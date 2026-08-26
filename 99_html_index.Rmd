@@ -19,18 +19,17 @@ output:
 
 # Introduction
 
-Spatial Data Science is a fast-growing discipline, with wide-ranging applications, including public health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity. 
+Spatial Data Science is a fast-growing discipline, with wide-ranging applications, including public health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity.
 
 In this class, you’ll learn how to acquire and manipulate spatial data, build machine learning models, and through a combination of lecture and hands-on computer work, leave with knowledge of theory and practice relevant for jobs, research, or solving real-world problems.
 
 Over the course of the semester, you will develop your own Spatial Data Science project, which will include the design and implementation, as well as the communication of results.
 
-
 # Classes
 
 - Lab 1
   - [Installation instructions](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Installation.html)
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab01.html)
+  - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab01.html)
   - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab01.ipynb)
   - [Lab notes (Python colab)](https://colab.research.google.com/drive/18oHWVeZJs-tHIkNGjsHMOtx0IVGZtlec?usp=sharing)
 - Lab 2
