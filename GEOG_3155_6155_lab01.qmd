@@ -77,7 +77,7 @@ For this class, the labs will assume that you have your files organized accordin
 |   +-- lab15
 ```
 
-To do this, go to your `Documents` folder, and create a new folder called `geog6160`. In this now create two new folders, one called `datafiles` (where we will store all the data used across all labs and one called `lab01`, which we will use for today's lab.
+To do this, go to your `Documents` folder, and create a new folder called `geog6155`. In this now create two new folders, one called `datafiles` (where we will store all the data used across all labs and one called `lab01`, which we will use for today's lab.
 
 Once you have created these folders, we need to change R's working directory so that it is pointing to `lab01`. The easiest way to do this is by going to the \[Session\] menu in RStudio, then \[Change working directory\]. This will open a file browser that you can use to browse through your computer and find the folder. (If you are using the base version of R, go to \[File\] $>$ \[Change dir...\] in Windows, or \[Misc\] $>$ \[Change Working Directory\] in Mac.)
 
@@ -105,7 +105,7 @@ setwd("")
 And paste your directory. The code should look something like this:
 
 ```{r eval=FALSE}
-setwd("C:/Users/username/Documents/geog6160/lab01")
+setwd("C:/Users/username/Documents/geog6155/lab01")
 ```
 
 Note that the slashes are forward slashes and don't forget the quotations. R is case sensitive, so make sure you write capitals where necessary. To check that you have correctly changed directory, enter the following command, which will show you the current working directory:
@@ -640,7 +640,7 @@ Save this and render it, and you should now see the figure appear in your output
 
 # Exercise
 
-For this lab, all you will need to do is add a second figure to your Quarto document and render it. You can choose any of the other figures introduced in this lab. You should submit the following through Canvas:
+For this lab, all you will need to do is add a second figure to your Quarto document and render it. You can choose any of the other figures introduced in this lab. You should submit the following through Canvas by September 8th:
 
 - The Quarto document
 - The rendered HTML page

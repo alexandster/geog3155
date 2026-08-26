@@ -29,19 +29,19 @@ While machine learning methods have been frequently used with spatial data, ther
 
 We'll use a couple of datasets to illustrate these methods:
 
--   *lsl.csv*: Location of landslide events in southern Ecuador
--   *ta.tif*: A raster file with environmental predictors
--   *data_atlantic_1998_2012.csv*: A dataset of cancer rates for counties in Atlantic states
--   *COUNTY_ATLANTIC.zip*: a shapefile for the Atlantic States
+- *lsl.csv*: Location of landslide events in southern Ecuador
+- *ta.tif*: A raster file with environmental predictors
+- *data_atlantic_1998_2012.csv*: A dataset of cancer rates for counties in Atlantic states
+- *COUNTY_ATLANTIC.zip*: a shapefile for the Atlantic States
 
 You will need to make sure the following packages are installed on your computer (in addition to the packages we have used in previous labs).
 
--   **terra**: working with raster data
--   **sf**: working with spatial data
--   **tmap**: making thematic maps
--   **spatialsample**: spatial sampling
--   **SpatialML**: geographic random forests
--   **FRK**: spatial basis functions
+- **terra**: working with raster data
+- **sf**: working with spatial data
+- **tmap**: making thematic maps
+- **spatialsample**: spatial sampling
+- **SpatialML**: geographic random forests
+- **FRK**: spatial basis functions
 
 As a reminder, packages can be installed in RStudio by going to the 'Packages' tab and clicking on the \[Install\] button, or from the menu \[Tools\]-\> \[Install packages...\]. You can also install these from the console window by typing
 
@@ -51,9 +51,9 @@ install.packages("terra")
 
 ## Objectives
 
--   Understand how to use different cross-validation strategies for spatial data
--   Use a geographic random forest to explore spatial variations in model results
--   Incorporate location in machine learning models
+- Understand how to use different cross-validation strategies for spatial data
+- Use a geographic random forest to explore spatial variations in model results
+- Incorporate location in machine learning models
 
 **It is highly recommended to use scripts or Quarto documents to store your R code - this will allow you to easily change and modify it and submit the exercise.**
 
@@ -115,6 +115,7 @@ tm_shape(env) +
   tm_shape(lsl_sf) +
   tm_dots()
 ```
+
 This function can be used with a second function (`tm_scale_interval`) which allows you to change the color palette and number of breaks (this uses a red palette and quantile breaks):
 
 ```{r eval=FALSE}
@@ -142,9 +143,9 @@ dat_test  <- testing(dat_split)
 
 Next, we'll build a model. We're going use a random forest without tuning, so we can simply:
 
--   Set up the formula to define the target (`lslpts`) and the features
--   Instantiate a random forest object
--   Fit the model using the training set
+- Set up the formula to define the target (`lslpts`) and the features
+- Instantiate a random forest object
+- Fit the model using the training set
 
 ```{r}
 lsl_f <- lslpts ~ slope + cplan + cprof + elev + log10_carea
@@ -168,10 +169,10 @@ We get an AUC of around 0.88, which indicates a pretty good model. We'll dig int
 
 Next, let's predict landslide susceptibility for the study region using the raster images we loaded above. In the previous lab, we did this by extracting all the values to a data frame, and then predicting. An easier way is to use the `predict` function that comes with the **terra** package, which allows direct prediction on raster layers. We'll do this below, but a few things to note:
 
--   We use the `::` notation to force R to use the `predict` function from the **terra** package (there are other packages with the same function name)
--   We use the fitted model from the tidymodels object (`rf_fit$fit`)
--   We set the `type` to `response` to get predictions on a 0-1 scale
--   Last, and possibly most important, the input raster (`env`) must have the same names for the layers as the columns in the data frame used to fit the model
+- We use the `::` notation to force R to use the `predict` function from the **terra** package (there are other packages with the same function name)
+- We use the fitted model from the tidymodels object (`rf_fit$fit`)
+- We set the `type` to `response` to get predictions on a 0-1 scale
+- Last, and possibly most important, the input raster (`env`) must have the same names for the layers as the columns in the data frame used to fit the model
 
 Let's now predict:
 
@@ -195,11 +196,11 @@ Now let's dig a little further into the cross-validation of this model. The AUC 
 
 First, let's re-run this as a 5-fold cross-validation to get a more robust estimate. For this we:
 
--   Define a recipe using the formula from above
--   Instantiate a random forest (we could simply reuse the code above, but adding this here helps clarify what is going on)
--   Define and create the folds
--   Link all of this together into a workflow
--   Run the cross-validation and check the results
+- Define a recipe using the formula from above
+- Instantiate a random forest (we could simply reuse the code above, but adding this here helps clarify what is going on)
+- Define and create the folds
+- Link all of this together into a workflow
+- Run the cross-validation and check the results
 
 ```{r}
 rec <- recipe(lslpts ~ slope + cplan + cprof + elev + log10_carea, lsl)
@@ -250,8 +251,8 @@ autoplot(spblock)
 
 We'll now use the first set of folds (the cluster sampling) to cross-validate the model. This integrates well with the **tidymodels** approach we have used so far, with the only difference that
 
--   We need to specify the `sf` object in the recipe, not the data frame
--   We use `spfolds` in the resampling.
+- We need to specify the `sf` object in the recipe, not the data frame
+- We use `spfolds` in the resampling.
 
 I've copied the full code again here, so that it is easier to see what is going on.
 
@@ -277,9 +278,9 @@ You should see here that the AUC decreases substantially, indicating less predic
 
 We'll now move on to exploring the use of location in machine learning. We'll look at this in three ways
 
--   Geographical random forest (GRF)
--   Using coordinates as features
--   Spatial basis functions
+- Geographical random forest (GRF)
+- Using coordinates as features
+- Spatial basis functions
 
 We'll also use a different data set here, with a continuous outcome, as the current GRF implementation does not work (well) with with binary outcomes.
 
@@ -321,8 +322,8 @@ atl_crds <- st_coordinates(st_centroid(atl_cancer))
 
 Now we can fit the model. We won't try and tune this here, but instead run it with an adaptive kernel that uses the 50 closest locations to build each model in a moving window (you might want to try playing with the `bw` argument to see how this affects the results). Note the other arguments:
 
--   The formula defining the relationship between variables
--   The dataframes holding the data (`dframe`) and coordinates (`coords`)
+- The formula defining the relationship between variables
+- The dataframes holding the data (`dframe`) and coordinates (`coords`)
 
 ```{r warning=FALSE, results='hide', message=FALSE}
 library(SpatialML)
@@ -367,8 +368,8 @@ tm_shape(atl_cancer) +
 
 A few things to note from these maps:
 
--   The local R2 values vary a lot (with some regions that have negative values). This can be interpreted as a map of where the model is doing a reasonable job (green) and where it fails (red). The low values indicate that other variables may be important in producing this model
--   The importance scores for the three features largely follow the same pattern (high importance around metropolitan centers, low elsewhere). This is not too surprising as pollutant values tend to correlate pretty strongly.
+- The local R2 values vary a lot (with some regions that have negative values). This can be interpreted as a map of where the model is doing a reasonable job (green) and where it fails (red). The low values indicate that other variables may be important in producing this model
+- The importance scores for the three features largely follow the same pattern (high importance around metropolitan centers, low elsewhere). This is not too surprising as pollutant values tend to correlate pretty strongly.
 
 ## Using coordinates as features
 
@@ -398,11 +399,11 @@ tm_shape(atl_cancer) +
 
 And these results show that systematic error in the model (note the region of negative values in the west and south, and positive values in the north-west). Before including the coordinates in a model, let's run a 5-fold cross-validation on this model to get a reference RMSE and $R^2$. I've listed all the steps in the next block of code for clarity:
 
--   Set up the recipe (no data processing)
--   Instantiate the model
--   Define the cross-validation strategy
--   Combine this into a workflow
--   Run the cross-validation and print results
+- Set up the recipe (no data processing)
+- Instantiate the model
+- Define the cross-validation strategy
+- Combine this into a workflow
+- Run the cross-validation and print results
 
 ```{r}
 rec <- recipe(Cancer ~ PM25 + NO2 + SO2, cancer)
@@ -477,8 +478,8 @@ By default, this places three levels of basis functions from low-resolution to c
 
 If you type the name of the basis object (`atl_basis`) it will give you an overview. This shows a total of 1428 functions that we could relate our observations too. We'll make some adjustments to this:
 
--   We'll only use two resolutions (`nres=2`)
--   We'll prune the basis functions. This removes all basis functions that have less than `prune` observations
+- We'll only use two resolutions (`nres=2`)
+- We'll prune the basis functions. This removes all basis functions that have less than `prune` observations
 
 Note that you can also adjust the resolution of the functions. For example, adding the argument `regular=2` will double the resolution. Alternatively, setting `regular=0` will add irregular basis functions based on the data density.
 
@@ -547,14 +548,14 @@ Use a Quarto document to record your answers and output. Assignments, to include
 
 ## *lsl.csv*
 
--   `x`: easting (m)
--   `y`: northing (m)
--   `lslpts`: presence or absence of landslide (`[0,1]`)
--   `slope`: slope angle (degrees)
--   `cplan`: plan curvature (rad m−1) expressing the convergence or divergence of a slope and thus water flow
--   `cprof`: profile curvature (rad m-1) as a measure of flow acceleration, also known as downslope change in slope angle
--   `elev`: elevation (m a.s.l.) as the representation of different altitudinal zones of vegetation and precipitation in the study area
--   `log10_carea`: the decadic logarithm of the catchment area (log10 m2) representing the amount of water flowing toward a location
+- `x`: easting (m)
+- `y`: northing (m)
+- `lslpts`: presence or absence of landslide (`[0,1]`)
+- `slope`: slope angle (degrees)
+- `cplan`: plan curvature (rad m−1) expressing the convergence or divergence of a slope and thus water flow
+- `cprof`: profile curvature (rad m-1) as a measure of flow acceleration, also known as downslope change in slope angle
+- `elev`: elevation (m a.s.l.) as the representation of different altitudinal zones of vegetation and precipitation in the study area
+- `log10_carea`: the decadic logarithm of the catchment area (log10 m2) representing the amount of water flowing toward a location
 
 ## *ta.tif*
 
@@ -562,12 +563,12 @@ Raster dataset with same predictor variables as *lsl.csv*
 
 ## *data_atlantic_1998_2012.csv*
 
--   `FIPS`: County FIPS code
--   `x`: Easting (m)
--   `y`: Northing (m)
--   `Cancer`: Cancer mortality rate / 100,000
--   `Poverty`: Poverty rate (% below poverty level)
--   `Smoking`: Smoking rate (%)
--   `PM25`: Annual mean PM2.5 concentration
--   `NO2`: Annual mean NO2 concentration
--   `SO2`: Annual mean SO2 concentration
+- `FIPS`: County FIPS code
+- `x`: Easting (m)
+- `y`: Northing (m)
+- `Cancer`: Cancer mortality rate / 100,000
+- `Poverty`: Poverty rate (% below poverty level)
+- `Smoking`: Smoking rate (%)
+- `PM25`: Annual mean PM2.5 concentration
+- `NO2`: Annual mean NO2 concentration
+- `SO2`: Annual mean SO2 concentration
