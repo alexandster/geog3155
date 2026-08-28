@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Alexander Hohl">
-<meta name="dcterms.date" content="2026-08-26">
 
-<title>GEOG 3155 6155 Introduction to Spatial Data Science: Fall 2026</title>
+<title>tes1</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -24,6 +22,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -88,26 +121,14 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">GEOG 3155 6155 Introduction to Spatial Data Science: Fall 2026</h1>
+<h1 class="title">tes1</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Alexander Hohl<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">August 26, 2026</p>
-    </div>
-  </div>
   
     
   </div>
@@ -117,109 +138,99 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="introduction" class="level1">
-<h1>Introduction</h1>
-<p>Spatial Data Science is a fast-growing discipline, with wide-ranging applications, including public health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity.</p>
-<p>In this class, you’ll learn how to acquire and manipulate spatial data, build machine learning models, and through a combination of lecture and hands-on computer work, leave with knowledge of theory and practice relevant for jobs, research, or solving real-world problems.</p>
-<p>Over the course of the semester, you will develop your own Spatial Data Science project, which will include the design and implementation, as well as the communication of results.</p>
+<section id="quarto" class="level2">
+<h2 class="anchored" data-anchor-id="quarto">Quarto</h2>
+<p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
 </section>
-<section id="classes" class="level1">
-<h1>Classes</h1>
-<ul>
-<li>Lab 1
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Installation.html">Installation instructions</a></li>
-<li><a href="https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab01.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab01.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1_GMhuHQDQMWpFJLETYfAz3moQ9E3pqIS?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 2
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab02.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab02.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://drive.google.com/file/d/1v6cTv3zA1YH7yvZHitBL5dstYRUgxOZq/view?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 3
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab03.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab03.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://drive.google.com/file/d/1SlhPrshvdMKUpi0gfmEobvlNwGuZmmec/view?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 4
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab04.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab04.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/11buvWJVZ3GPZasCv0wNlfqSzjLreTEQA?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 5
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab05.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab05.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1aQa9VsSqM9xcl7VOvRkeTQ1kKKxrJuBk?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 6
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab06.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab06.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1gXjnjgRxD-4X-haoWLc9G-a5MP-P96xj?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Preprocessing lab
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Preprocessing_Examples.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_Preprocessing_Examples.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1UW5Hk2dyk_gMSTh5D7Q5_ttVHu2Kjort?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 7
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab07.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab07.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1Pjedvyh7aGc1NL6b1aRkUTfYRgyA0NyV?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 8
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab08.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab08.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1gLwg6nTJ-mtKvp3nti1gyAUk1ZQQs1ob?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 9
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab09.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab09.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1mw2JOBrI80qA6e4Zs-REP7BZBjiEyhFK?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 10
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab10.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab10.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1pIZrXAqV-YeHx_EvWx-Y6J9EO5X7F6jA?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_CNN_assignment_08.html">CNN assignment</a></li>
-<li>Lab 11
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab11.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab11.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1EOC11JasR03aJBvDz-ohoDfftR3TPm6u?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-<li>Lab 12
-<ul>
-<li><a href="https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab12.html">Lab notes (R)</a></li>
-<li><a href="https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab12.ipynb">Lab notes (Python notebook)</a></li>
-<li><a href="https://colab.research.google.com/drive/1QyZTtjJmfyS2vcuPac1fUTiuZWwXcgPa?usp=sharing">Lab notes (Python colab)</a></li>
-</ul></li>
-</ul>
+<section id="running-code" class="level2">
+<h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
+<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+<p>You can add options to executable code like this</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+</section>
+<section id="instsall-packages" class="level2">
+<h2 class="anchored" data-anchor-id="instsall-packages">Instsall packages</h2>
+<p>Here we install packages</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("tidyverse")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyverse' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggplot2' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tibble' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyr' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'readr' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'purrr' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'dplyr' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'stringr' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'forcats' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'lubridate' was built under R version 4.5.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+</div>
+</section>
+<section id="read-in-file" class="level2">
+<h2 class="anchored" data-anchor-id="read-in-file">read in file</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>penguin <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"./datafiles/penguins.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(penguin<span class="sc">$</span>bill_length_mm, <span class="at">type =</span> <span class="st">'p'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="test_lab01_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>
 
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>University of Utah, alexander.hohl@ess.utah.edu<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>University of Utah, alexander.hohl@ess.utah.edu<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>University of Utah, alexander.hohl@ess.utah.edu<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
