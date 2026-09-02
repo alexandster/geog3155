@@ -884,3 +884,11 @@ leaflet() %>%
 ```
 
 ------------------------------------------------------------------------
+
+# Exercise
+
+For this lab, you need to make a map.
+
+- Undergraduates use the tmap package to make a static map of total housing units per census tract in Salt Lake County (HU100 column of tracts dataset).
+
+- Graduates use leaflet to make an interactive map of [trailheads](https://gis.utah.gov/products/sgid/recreation/trailheads/) in Utah.
