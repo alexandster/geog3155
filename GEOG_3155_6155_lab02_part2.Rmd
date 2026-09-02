@@ -4,7 +4,7 @@ knit: (function(input_file, encoding) {
   out_dir <- 'docs';
   rmarkdown::render(input_file,
  encoding=encoding,
- output_file=file.path(dirname(input_file), out_dir, 'UGIC_Workshop_02_Spatial_Data_2.html'))})
+ output_file=file.path(dirname(input_file), out_dir, 'GEOG_3155_6155_lab02_part2.html'))})
 author: | 
   | Alexander Hohl
   | School of Environment, Society & Sustainability
