@@ -439,7 +439,7 @@ sf_use_s2(FALSE)
 library(sf)
 
 ## Census tracts for Salt Lake County with population density
-tracts <- st_read("./datafiles/slc_tract/slc_tract_2015.shp")
+tracts <- st_read("./datafiles/slc_tract/slc_tract_2020.shp")
 ## Salt Lake light rail tracks
 lightrail <- st_read("./datafiles/LightRail_UTA/LightRail_UTA.shp")
 ## Salt Lake light rail stations
@@ -582,7 +582,7 @@ tm_shape(tracts) +
   tm_shape(stations) +
   tm_dots(size = 0.25, shape = 23) +
   tm_compass(position = c("left", "bottom")) +
-  tm_scale_bar(position = c("right", "top")) +
+  tm_scalebar(position = c("right", "top")) +
   tm_layout(main.title = "Salt Lake County Light Rail", 
             legend.outside = TRUE,
             legend.outside.position = c("left"))
@@ -594,7 +594,7 @@ The map can be clipped to smaller regions by using the `bbox` argument in the fi
 ```{r fig.keep='high', message=FALSE}
 
 tracts_sub = tracts %>%
-  dplyr::filter(TRACTCE %in% c(102500, 102600, 114000))
+  dplyr::filter(TRACTCE20 %in% c(102500, 102600, 114000))
 
 tm_shape(tracts, bbox = st_bbox(tracts_sub)) + 
   tm_borders("lightgray") +
@@ -614,7 +614,7 @@ Finally, **tmap** allows you to make interactive maps fairly simply with the `tm
 tmap_mode("view")
 
 tm_shape(tracts) + 
-  tm_fill("density", title = "Popn density", palette = "Greens", style = "quantile", id = "TRACTCE") +
+  tm_fill("density", title = "Popn density", palette = "Greens", style = "quantile", id = "TRACTCE20") +
   tm_borders("lightgray") +
   tm_shape(lightrail) +
   tm_lines(lwd = 2) +
