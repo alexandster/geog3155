@@ -1,0 +1,886 @@
+---
+title: "GEOG 3155/6155 Lab 02 Spatial data in R Part 2"
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'UGIC_Workshop_02_Spatial_Data_2.html'))})
+author: | 
+  | Alexander Hohl
+  | School of Environment, Society & Sustainability
+  | University of Utah
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+```{r include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
+
+```
+
+We'll carry on looking at spatial data in this lab. You'll need the following files. Some of these were used in the previous lab, but it's worth checking to make sure you have everything. Download anything missing from the Google drive and move them to your `data` folder:
+
+- Climate dataset for Western North America: *WNAclimate.csv*
+- A shapefile of UTA light rail routes: *LightRail_UTA.shp*
+- A shapefile of UTA light rail stations: *LightRailStations_UTA.shp*
+- A shapefile of Utah counties: *utahcounty.shp*
+- A shapefile of Salt Lake County census tracts: *slc_tracts.shp*
+- A folder of Landsat 8 images in GeoTiff format: *rs*
+- A shapefile of California places: *ca_places.shp*
+
+Note for the shapefiles, you will need to download the full folder for each one to get the shapefile and the associated extra files. If you are not sure about this, please let me know.
+
+Base R has no structure for spatial data, so you will need to install the following packages (you should have some of these from previous modules):
+
+- **sf**
+- **terra**
+- **RColorBrewer**
+- **ggplot2**
+- **viridis**
+
+```{r, message = FALSE, warning=FALSE}
+
+library(ggplot2)
+library(terra)
+library(RColorBrewer)
+library(sf)
+library(viridis)
+
+```
+
+# Raster data
+
+Previously, we were working with *vector* spatial data. These are geometries composed of points defined by their coordinates. An alternative form of spatial data is known as a *raster*. This is gridded data. It takes the form of a rectangle composed of squares of equal size, which are sometimes called 'cells' or 'pixels'. Each cell stores some kind of value.
+
+This simplifies the geometry, which can be specified by two pieces of information: the spatial extent of the raster and the resolution of the cells. Here we create a blank raster with 10 rows and 10 columns, with a resolution of 10x10 using the `rast()` function. We then assign random values to each cell:
+
+```{r, echo = TRUE}
+
+r <- rast(nrow = 10, ncol = 10, 
+          xmin = 0, xmax = 100, 
+          ymin = 0, ymax = 100)
+
+r[] <- runif(n = 100)
+
+r
+```
+
+`rast` objects can be plotted using the base `plot()` command:
+
+```{r}
+
+plot(r)
+
+```
+
+The **terra** package offers a wide array of functions for dealing with gridded data, including the ability to read from many widely used file formats, like remote sensing images (e.g. GeoTiffs), NetCDF, and HDF formats. We will use it here to work with a Landsat 8 scene collected on June 14, 2017. The subset covers the area between Concord and Stockton, in California, USA. The files are contained in the zip file *rs.zip*. Download this (if you haven't already) and unzip it in your `data` folder.
+
+We will also need the shapefile of California places (*ca_places.zip*), so download and unzip this as well. We'll read this in before starting:
+
+```{r}
+
+ca_places <- st_read("./datafiles/ca_places/ca_places.shp")
+
+```
+
+<br>
+
+## Read and Write Rasters
+
+To read in gridded data, use the `rast()` function. This will read in the Near Infrared (NIR) channel (`B5`)
+
+```{r, eval = TRUE}
+
+b5 <- rast("./datafiles/rs/LC08_044034_20170614_B5.tif")
+
+b5
+
+```
+
+When we print the `rast` object created, the second line of the output lists the dimensions of the data. Note that here, this has 1245 rows, 1497 columns and 1 layer. This also shows the resolution (30x30 m), the extent, the CRS and the a brief summary of the data.
+
+We can write `rast` objects back to file using `writeRaster()` (I'll bet you never thought it would be called that). You can write out to any format supported by [GDAL](https://gdal.org/drivers/raster/index.html). Here we write out to a TIFF format. You can see the full list of available formats for reading and writing by running the `writeFormats()` function in the console. We'll use this again after having worked with the data.
+
+```{r, eval = FALSE}
+
+writeRaster(b5, 
+            filename = "./b5.tif",
+            overwrite = TRUE)
+
+```
+
+<br>
+
+## Raster CRS
+
+As with the `sf` objects, we can check the coordinate reference system of the file we just read. This does not print very well, but if you look at the end you'll see a reference to the EPSG code (32610).
+
+```{r, message = FALSE, warning = FALSE}
+
+crs(b5)
+
+```
+
+If the CRS is not set, you can set it using the `crs()` function and an EPSG code. For example, the following code would set the CRS to WGS84 (**don't run this as the CRS is already defined**)
+
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+
+crs(b5) <- "EPSG:4326"
+
+```
+
+Again, this should not be used to *change* the CRS, only set it. Note that `crs` is for `rast` objects, `st_crs` for vectors.
+
+<br>
+
+You can transform the CRS for a raster layer using `project()`. This can again use a EPSG type code.
+
+```{r, warning = FALSE}
+
+b5_wgs84 <- project(b5, "EPSG:4326")
+
+crs(b5_wgs84)
+
+```
+
+We'll keep the Landsat data in its UTM projection (10N), and reproject the CA place data to match:
+
+```{r}
+
+ca_places <- st_transform(ca_places, 32610)
+
+```
+
+<br>
+
+## Basic Plotting
+
+You can make a simple plot using the `plot()` function:
+
+```{r}
+
+plot(b5, main = "Landsat 8 (B2)")
+
+plot(st_geometry(ca_places), add = TRUE)
+
+```
+
+<br>
+
+## Summary Statistics
+
+The function `global()` can be used to calculate most summary statistics for a raster layer. So to get the mean global temperature (and standard deviation):
+
+```{r}
+
+global(b5, mean)
+
+global(b5, sd)
+
+```
+
+<br>
+
+## Subset Rasters
+
+If we want to use only a subset of the original raster layer, the function `crop()` will extract only the cells in a given region. This can be defined using another raster object or Spatial\* object, or by defining an `extent` object:
+
+```{r}
+
+# extent method
+my_ext <- ext(c(xmin = 612500, 
+                    xmax = 617500, 
+                    ymin = 4196000,
+                    ymax = 4201000))
+
+b5_sub <- crop(b5, my_ext)
+
+plot(b5_sub)
+
+```
+
+We can also use an `sf` object to crop the data. Here, we'll extract the polygon for Bethel Island from the `ca_places` object, and use this to crop the raster:
+
+```{r}
+
+bethel <- ca_places %>% 
+  dplyr::filter(NAME == "Bethel Island")
+
+b5_sub <- crop(b5, bethel)
+
+plot(b5_sub)
+plot(st_geometry(bethel), add = TRUE)
+
+```
+
+Note that `crop` subsets the original raster to the extent of Canada's borders, rather than to the borders themselves. This is because rasters are *always* rectangular. You can 'hide' the values of raster cells outside of a polygon by using the `mask` function. The raster has to be rectangular, so this does not remove the cells outside the polygon. Rather, it sets their value to `NA`.
+
+```{r}
+
+b5_sub <- mask(b5_sub, mask = bethel)
+
+plot(b5_sub)
+plot(st_geometry(bethel), add = TRUE)
+
+```
+
+## Extract Data
+
+Values can be extracted from individual locations (or sets of locations) using `extract()`. This can take a set of coordinates in matrix form, or use a Spatial\* object. To get the reflectance value at 615000 E, 4199000 N:
+
+```{r}
+
+extract(b5, cbind(615000,4199000))
+
+```
+
+You can also extract for multiple locations. Let's generate a set of random points in Bethel Island, and then sample the reflectance value for each of these.
+
+```{r}
+
+random_pnts <- st_sample(bethel, size = 20)
+
+extract(b5, st_coordinates(random_pnts))
+
+```
+
+You can also extract values within a polygon, by replacing the point coordinates with a `sf` polygon:
+
+```{r}
+
+b5_bethel <- extract(b5, bethel)
+
+head(b5_bethel)
+
+```
+
+By default, this returns the value of all pixels within the polygon. By adding the `fun=` argument, you can easily calculate summary statistics:
+
+```{r}
+
+extract(b5, bethel, fun = 'median')
+
+```
+
+Note that if the `sf` object has multiple polygons, it will return the summary statistic for each one. Let's now extract the values for a different place (Oakley), and then we can compare them. We do this in a couple of steps. First get the polygon for Oakley, then extract using the two polygons combined.
+
+```{r}
+
+oakley <- ca_places %>% 
+  dplyr::filter(NAME == "Oakley")
+
+b5_bethel_oakley <- extract(b5, rbind(bethel, oakley))
+
+names(b5_bethel_oakley) <- c("ID", "B5")
+
+```
+
+We'll visualize the difference with **ggplot2**, which shows higher NIR reflectance values for Bethel, likely indicating higher vegetation cover.
+
+```{r}
+
+ggplot(b5_bethel_oakley, aes(x = B5, fill = as.factor(ID))) +
+  geom_histogram(alpha = 0.7, position = 'identity')
+
+```
+
+<br>
+
+# Raster Stacks
+
+The `b2` raster represents a single band from the Landsat 8 scene. More usefully, we can load several bands and combine them into a single object. Here, we'll load the blue (B2), green (B3), red (B4), and infrared (B5) bands :
+
+```{r}
+# Blue
+b2 <- rast('datafiles/rs/LC08_044034_20170614_B2.tif')
+# Green
+b3 <- rast('datafiles/rs/LC08_044034_20170614_B3.tif')
+# Red
+b4 <- rast('datafiles/rs/LC08_044034_20170614_B4.tif')
+# Near Infrared (NIR)
+b5 <- rast('datafiles/rs/LC08_044034_20170614_B5.tif')
+```
+
+Now we'll create a raster stack with all 4 of these:
+
+```{r}
+
+s <- c(b5, b4, b3, b2)
+
+s
+
+```
+
+The metadata now shows that this contains 4 layers. You can also make the stack directly by passing a list of file names:
+
+```{r}
+
+filenames <- paste0('./datafiles/rs/LC08_044034_20170614_B', 1:11, ".tif")
+
+landsat <- rast(filenames)
+
+landsat
+
+```
+
+This now contains all bands representing reflection intensity in the following wavelengths: Ultra Blue, Blue, Green, Red, Near Infrared (NIR), Shortwave Infrared (SWIR) 1, Shortwave Infrared (SWIR) 2, Panchromatic, Cirrus, Thermal Infrared (TIRS) 1, Thermal Infrared (TIRS) 2.
+
+If we now use the `extract()` function with this object, it will return values for all bands in the stack:
+
+```{r}
+
+extract(landsat, cbind(615000,4199000))
+
+```
+
+```{r}
+par(mfrow = c(2,2))
+plot(b2, main = "Blue", col = gray(0:100 / 100))
+plot(b3, main = "Green", col = gray(0:100 / 100))
+plot(b4, main = "Red", col = gray(0:100 / 100))
+plot(b5, main = "NIR", col = gray(0:100 / 100))
+```
+
+The values in each layer range from 0 to 1, and the same scale has been used for each band, showing clearly the difference in reflectance for this set of wavelengths. For example, vegetation reflects more energy in NIR than other wavelengths and thus appears brighter. In contrast, water absorbs most of the energy in the NIR wavelength and it appears dark
+
+# Composite images
+
+The bands can be combined to form composite images. Here, we'll use the red, green and blue bands make a true color image. This uses the concatenation function (`c()`), and the order of the bands is important (R, then G, then B):
+
+```{r}
+
+landsatRGB <- c(b4, b3, b2)
+
+plotRGB(landsatRGB, stretch = "lin")
+
+```
+
+We can also make a false color composite with the NIR, red and green bands, where bright reds indicate vegetation cover:
+
+Another popular image visualization method in remote sensing is known "false color" image in which NIR, red, and green bands are combined. This representation is popular as it makes it easy to see the vegetation (in red).
+
+```{r}
+
+landsatFCC <- c(b5, b4, b3)
+plotRGB(landsatFCC, stretch="lin")
+
+```
+
+# Raster algebra
+
+**terra** makes it easy to carry out simple raster algebraic operations. Eahc band or layer is treated a 2D array which makes it possible to add, subtract, multiply, divide, etc. As a simple example here, we can calculate the NDVI for the Landsat scene as
+
+$$NDVI = (NIR - R) / (NIR + R)$$
+
+NIR is band 5 and red is band 4:
+
+```{r}
+
+ndvi <- (b5 - b4) / (b5 + b4)
+
+plot(ndvi, col=rev(terrain.colors(10)), main = "NDVI")
+
+```
+
+We can also make a quick histogram of values to look for any outliers:
+
+```{r}
+
+hist(ndvi, main = "NDVI")
+
+```
+
+We can then use the results to carry out some simple classification.
+
+- Vegetation (NDVI \> 0.4). The `clamp` function masks all value otuside of a range (here below 0.4)
+
+```{r}
+
+veg = clamp(ndvi, lower=0.4, values=FALSE)
+
+plot(veg)
+
+```
+
+- Croplands (corresponding to the peak in NDVI values):
+
+```{r}
+
+crops = ndvi > 0.25 & ndvi < 0.3 
+
+plot(crops)
+
+```
+
+And water bodies (NDVI \< 0):
+
+```{r}
+
+water = ndvi < 0
+
+plot(water)
+
+```
+
+# Mapping packages
+
+In the previous lab, we looked at making maps in base R (with the `plot()` function and an `sf` object) as well as using **ggplot2**. More recently, there has been something of an explosion in mapping packages, including interactive maps. We'll look here at two of these: **tmap** and **leaflet**. Other useful ones include **mapsf** **highcharter**, **mapview** and **mapdeck**.
+
+```{r message=FALSE, warning=FALSE, results='hide'}
+
+sf_use_s2(FALSE)
+
+library(sf)
+
+## Census tracts for Salt Lake County with population density
+tracts <- st_read("./datafiles/slc_tract/slc_tract_2015.shp")
+## Salt Lake light rail tracks
+lightrail <- st_read("./datafiles/LightRail_UTA/LightRail_UTA.shp")
+## Salt Lake light rail stations
+stations <- st_read("./datafiles/LightRailStations_UTA/LightRailStations_UTA.shp")
+
+## W North America Climate
+wna_climate <- read.csv("./datafiles/WNAclimate.csv")
+
+## Landsat images for California
+# Blue
+b2 <- rast('datafiles/rs/LC08_044034_20170614_B2.tif')
+# Green
+b3 <- rast('datafiles/rs/LC08_044034_20170614_B3.tif')
+# Red
+b4 <- rast('datafiles/rs/LC08_044034_20170614_B4.tif')
+## Places for California
+ca_places <- st_read("./datafiles/ca_places/ca_places.shp")
+
+```
+
+## `tmap`
+
+**tmap** makes thematic maps. It works in a very similar way to **ggplot2**, by building a series of layers and map geometries and elements. In general, we start by using `tm_shape()` to identify the spatial object to be used, and add geometries are added, including filled polygons, borders and symbols. Finally, we can add legends, scale bars, etc. Note that you will need to install this package if you haven't done so already (`install.packages("tmap")`). We'll look at three examples of working with this package here, but there are a lot more details and examples on the [TMap website](https://r-tmap.github.io/tmap/).
+
+### Example 1: Salt Lake County
+
+We'll first make a map with a mixture of vector layers, including census tracts, light rail tracks and stations. If we check the CRS, you'll see that `tracts` has a different one, so will need to be reprojected:
+
+```{r}
+
+st_crs(tracts)$epsg
+
+st_crs(lightrail)$epsg
+
+```
+
+```{r}
+
+tracts <- st_transform(tracts, st_crs(lightrail))
+
+```
+
+Now let's start mapping things out with **tmap**. First, let's make a simple map showing the polygon outlines using `tm_borders()`. This is the standard **tmap** method: first define the object that you want to plot with `tm_shape`, then define what you want to plot.
+
+```{r fig.keep='high', message=FALSE}
+
+library(tmap)
+
+tm_shape(tracts) + 
+  tm_borders()
+
+```
+
+The function `tm_fill()` will then fill these using one of the variables in the tract data set. We'll use the population density (`density`). Note that this automatically adds a legend within the frame of the figure:
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density") +
+  tm_borders()
+
+```
+
+The color scale can be changed by setting the `palette` argument in `tm_fill()`. This includes ColorBrewer and viridis scales and there are a set of methods todefine the intervals in the color palette. For example, to use the 'Greens' palette with percentile breaks. We also change the color of the tract boundaries to lightgray:
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray")
+
+```
+
+You can reverse the color scale by prepending a `-`. This uses a reversed `magma` palette from the viridis set, with a continuous palette:
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density", palette = "-magma", style = "cont") +
+  tm_borders("lightgray")
+
+```
+
+If you want to see the full set of palettes that you can use, install the **tmaptools** package and run the following code (you may also need to install **shinyjs**):
+
+```{r eval=FALSE}
+
+tmaptools::palette_explorer()
+
+```
+
+Let's now add another layer. We'll overlay the light rail track on this map. As this is a different object in R (`lightrail`), we first need to use `tm_shape` to indicate that we are using it, then add `tm_lines()` to show the routes. We'll make the lines a little thicker with `lwd` and change the type to `dashed`.
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2, lty = 'dashed', col = "darkorange")
+
+```
+
+Note that if you use a varible name for the color, it will thematically map the lines (I've removed the polygon fill to make this clear):
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  #tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 4, col = "ROUTE")
+
+```
+
+We can now add the stations (using `tm_shape()` to select the correct object to plot):
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23)
+
+```
+
+Now let's add some details to the map. We'll add a graticule before the polygons are plotted, a compass and a scalebar. We'll also use the `tm_layout` function to add a title and move the legend to a new position. (This function has a lot of options for changing your map - it's well worth checking the help page.)
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_graticules(col = "lightgray") + 
+  tm_fill("density", title = "Popn density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23) +
+  tm_compass(position = c("left", "bottom")) +
+  tm_scale_bar(position = c("right", "top")) +
+  tm_layout(main.title = "Salt Lake County Light Rail", 
+            legend.outside = TRUE,
+            legend.outside.position = c("left"))
+
+```
+
+The map can be clipped to smaller regions by using the `bbox` argument in the first `tm_shape()` function. In this code, we'll extract a set of census tracts that correspond to downtown Salt Lake. We'll then use the the bounding box of these to crop the map (I've removed the fill). We'll also add the station name using `tm_text()`:
+
+```{r fig.keep='high', message=FALSE}
+
+tracts_sub = tracts %>%
+  dplyr::filter(TRACTCE %in% c(102500, 102600, 114000))
+
+tm_shape(tracts, bbox = st_bbox(tracts_sub)) + 
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23) +
+  tm_text("STATIONNAM", ymod = -1, bg.color = "white", size = 0.8)
+
+```
+
+Finally, **tmap** allows you to make interactive maps fairly simply with the `tmap_mode()` function. Setting this to `view` will make an interactive map, to `plot` will make a static map (like the ones we have made so far). Here we'll remake the full map as an interactive map:
+
+```{r}
+
+## Set interactive
+tmap_mode("view")
+
+tm_shape(tracts) + 
+  tm_fill("density", title = "Popn density", palette = "Greens", style = "quantile", id = "TRACTCE") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23)
+
+```
+
+We'll reset back to static maps for the rest of this exercise:
+
+```{r}
+
+tmap_mode("plot")
+
+```
+
+### Example 2: W N America climate
+
+In this example, we'll map out the climate data from western North America. We'll go a bit faster in this example and not explain every step. First we'll need to convert the `wna_climate` data frame to an `sf` object:
+
+```{r}
+
+wna_climate <- st_as_sf(wna_climate, 
+                        coords = c("LONDD", "LATDD"),
+                        crs = 4326)
+```
+
+Make a quick thematic map of average july temperature:
+
+```{r}
+tm_shape(wna_climate) +
+  tm_symbols(col = "Jul_Tmp")
+```
+
+Next, we'll download country outlines and river centerlines from [Natural Earth](https://www.naturalearthdata.com) using the **rnaturalearth** package (you will need to install this). This will download layers from the Natural Earth website - there are a variety of these available, including country and state boundaries, physical features (rivers, lakes, etc) and cultural features (place names, roads, etc). There are three levels of resolution: 1:10m, 1:50m and 1:110m. To download a layer, you need to specify the resolution (`scale`) and the name of the layer. The full set of available layers can be found [here](https://cran.r-project.org/web/packages/rnaturalearth/vignettes/rnaturalearth.html)
+
+```{r message=FALSE, results='hide'}
+
+library(rnaturalearth)
+
+countries50 <- ne_download(scale = 50, type = "admin_0_countries")
+rivers50 <- ne_download(scale = 50, type = "rivers_lake_centerlines", category = "physical")
+
+```
+
+Now we can put this all together as a series of layers. We'll make the color palette continuous and use a red-blue palette.
+
+```{r}
+
+tm_shape(countries50, bbox = st_bbox(wna_climate)) +
+  tm_borders() +
+  tm_shape(rivers50) +
+  tm_lines("lightblue", lwd = 2) +
+  tm_shape(wna_climate) +
+  tm_symbols(col = "Jul_Tmp", palette = "-RdBu", alpha = 0.75,
+             style = "cont", title.col = "degC")
+
+```
+
+Finally, we'll make two maps (july temperature and annual precipitation), and use `tmap_arrange()` to make a two panel plot:
+
+```{r}
+
+m1 = tm_shape(countries50, bbox = st_bbox(wna_climate)) +
+  tm_borders() +
+  tm_shape(rivers50) +
+  tm_lines("lightblue", lwd = 2) +
+  tm_shape(wna_climate) +
+  tm_symbols(col = "Jul_Tmp", palette = "-RdBu", alpha = 0.75,
+             style = "cont", title.col = "degC")
+
+m2 = tm_shape(countries50, bbox = st_bbox(wna_climate)) +
+  tm_borders() +
+  tm_shape(rivers50) +
+  tm_lines("lightblue", lwd = 2) +
+  tm_shape(wna_climate) +
+  tm_symbols(col = "annp", palette = "BuPu", alpha = 0.75,
+             style = "cont", title.col = "mm/yr")
+
+tmap_arrange(m1, m2)
+
+```
+
+### Example 3: Raster images
+
+In the final example, we'll use the Landsat data with **tmap**. The main function to map raster data is `tm_raster()`. We'll use it here to show the ndvi layer made earlier.
+
+```{r}
+
+tm_shape(ndvi) +
+  tm_raster()
+
+```
+
+We'll update this a little by clamping the NDVI values at a lower limit of 0, changing the color palette and making it continuous. We'll also add the California places added as an overlay.
+
+```{r}
+
+tm_shape(clamp(ndvi, lower = 0)) +
+  tm_raster(palette = "Greens", style = "cont", title = "NDVI") +
+  tm_shape(ca_places) +
+  tm_borders(lwd = 2) +
+  tm_layout(main.title = "Landsat 8 (2017/06/14)", 
+            legend.position = c("left", "top"), 
+            legend.bg.color = "white", legend.bg.alpha = 0.7)
+
+```
+
+A second function (`tm_rgb()`) allows the creation of color composites. We'll use the red, green and blue bands to make the true color composite. The maximum reflectance value in these files is 1.0, so we need to set this for scaling.
+
+```{r}
+
+tm_shape(landsat) + 
+  tm_rgb(r = 4, g = 3, b = 2, max.value = 1)
+
+```
+
+When we made this figure earlier, it was a lot brighter. This is because the previous function 'stretched' the range of values for each layer. We can mimic that here by first using the `stretch()` function from **terra**, then repeating the plot:
+
+```{r}
+
+landsat_stretch = stretch(landsat, minv = 0, maxv = 1, 
+                          minq = 0.01, maxq = 0.99)
+
+tm_shape(landsat_stretch) + 
+  tm_rgb(r = 4, g = 3, b = 2, max.value = 1)
+
+```
+
+## `leaflet`
+
+The **tmap** mode function allows you to quickly make an interacitve map. The resulting map is based on the well-known Leaflet javascript library, which offers a much greater range of flexibility in making these maps. Fortunately, there is an R library (**leaflet**) that allows access to the Leaflet API allowing you to build quite complex maps from R. We'll remake the map of Salt Lake County and the light rail routes using this now. First install the library (`install.packages("leaflet")`), and load it (and a helper library for working with html formats):
+
+```{r}
+library(leaflet)
+library(htmltools)
+```
+
+**leaflet** operates in a similar way to **ggplot2** and **tmap** in building a map by layers. Layers are added using the pipe operator that we encountered in an earlier lab (`%>%`). There are three basic ingredients that are required:
+
+- A blank map canvas from the `leaflet()` function
+- A set of background tiles
+- One or more markers or polygons to display
+
+Here's a really simple example, where we use the default tiles from OpenStreetMap and drop a marker on the University of Utah:
+
+```{r}
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-111.8421, lat=40.7649, popup="The University of Utah")
+m  # Print the map
+```
+
+You can also try changing the *Provider* - the source of the background map. For example, this will use ESRI map (the map is not shown here but will appear in RStudio when you run this):
+
+```{r eval=FALSE}
+m <- leaflet() %>%
+  addProviderTiles("Esri.WorldStreetMap") %>%  
+  addMarkers(lng=-111.8421, lat=40.7649, popup="The University of Utah")
+m
+```
+
+ESRI imagery:
+
+```{r eval=FALSE}
+m <- leaflet() %>%
+  addProviderTiles("Esri.WorldImagery") %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-111.8421, lat=40.7649, popup="The University of Utah")
+m
+```
+
+You can find a full set of these providers here: <https://leaflet-extras.github.io/leaflet-providers/preview/>
+
+We'll now add the census tracts and light rail `sf` objects. First, these need to be reprojected to WGS84 long-lat (EPSG code 4326) to work with Leaflet.
+
+```{r}
+tracts_ll <- st_transform(tracts, crs = 4326)
+stations_ll <- st_transform(stations, crs = 4326)
+lightrail_ll <- st_transform(lightrail, crs = 4326)
+```
+
+Now we can add these to a dark basemap. First the tracts with `addPolygons`, then the routes (`addPolylines`) and stations (`addMarkers`). Note that the stations include a `label` taken from the station name column in the `sf` object. This wil appear when you hover your cursor over a marker.
+
+```{r eval=FALSE}
+leaflet() %>%
+  # add a dark basemap
+  addProviderTiles("CartoDB.DarkMatter") %>%
+  # add the polygons of the clusters
+  addPolygons(
+    data = tracts_ll,
+    color = "#E2E2E2",
+    opacity = 1, # set the opacity of the outline
+    weight = 1, # set the stroke width in pixels
+    fillOpacity = 0.2 # set the fill opacity
+  ) %>%
+  addPolylines(
+    data = lightrail_ll
+  ) %>%
+  addMarkers(
+    data = stations_ll,
+    label = ~htmlEscape(STATIONNAM)
+  )
+```
+
+Finally, we'll add some extra details. First, we'll set colors for each station by the light rail line it lies on. This is a little complicated - below we:
+
+- Get the list of unique station names
+- Make up a color palette from the **RColorBrewer** package (you may need to install this)
+- Convert the station names to an integer code (so the first name alphabetically will be 1, etc)
+- Finally use the integer code to assign the matching color back to the `sf` object
+
+```{r}
+unique(stations_ll$LINENAME)
+
+line_pal <- RColorBrewer::brewer.pal(9, "Set1")
+line_no <- as.numeric(as.factor(stations_ll$LINENAME))
+
+stations_ll$LINECOL <- line_pal[line_no]
+```
+
+Next we'll make a popup window for each station. This will appear when the marker is clicked (as opposed to the label which appears when a cursor hovers over the marker). This has to be formatted using html. Here, we use R's `paste()` function to stick together html tags with the station name, address, etc. The `<b>` tags make the labels bold, and the `<br>` tags add a line break. You can do a lot more here, for example, including images or URLs in each popup.
+
+```{r}
+station_popup = paste0(
+  "<b>Station: </b>",
+  stations_ll$STATIONNAM,
+  "<br>",
+  "<b>Line Name: </b>",
+  stations_ll$LINENAME,
+  "<br>",
+  "<b>Park n Ride: </b>",
+  stations_ll$PARKNRIDE,
+  "<br>",
+  "<b>Address: </b>",
+  stations_ll$ADDRESS
+  
+)
+```
+
+With all this in place, we can rebuild our map. The main changes here are that we use a circle marker as this has an option to change color, and include the popup information in the marker.
+
+```{r}
+leaflet() %>%
+  # add a dark basemap
+  addProviderTiles("Esri.WorldStreetMap") %>%
+  # add the polygons of the clusters
+  addPolygons(
+    data = tracts_ll,
+    color = "#E2E2E2",
+    # set the opacity of the outline
+    opacity = 1,
+    # set the stroke width in pixels
+    weight = 1,
+    # set the fill opacity
+    fillOpacity = 0.2
+  ) %>%
+  addPolylines(
+    data = lightrail_ll
+  ) %>%
+  addCircleMarkers(
+    data = stations_ll,
+    color = ~LINECOL,
+    label = ~htmlEscape(STATIONNAM),
+    popup = station_popup
+  )
+
+```
+
+------------------------------------------------------------------------
