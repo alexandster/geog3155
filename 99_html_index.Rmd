@@ -37,8 +37,8 @@ Over the course of the semester, you will develop your own Spatial Data Science 
   - [Lab notes (R) Part 2](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab02_part2.html)
 - Lab 3
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab03.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab03.ipynb)
-  - [Lab notes (Python colab)](https://drive.google.com/file/d/1SlhPrshvdMKUpi0gfmEobvlNwGuZmmec/view?usp=sharing)
+  - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab03.ipynb)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1UxVwNIHiop2P5mWlIxWwY2HY9_8wE8_y?usp=sharing)
 - Lab 4
   - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab04.html)
   - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab04.ipynb)
