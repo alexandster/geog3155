@@ -895,6 +895,6 @@ For this lab, you need to make a map.
 
 You should submit the following through Canvas:
 
--  The Quarto document
+- The Quarto document
 
--  The rendered HTML page
+- The rendered HTML page
