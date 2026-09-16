@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alexander Hohl">
-<meta name="dcterms.date" content="2026-09-14">
+<meta name="dcterms.date" content="2026-09-16">
 
 <title>GEOG 3155 6155 Lab 03</title>
 <style>
@@ -4244,7 +4244,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 14, 2026</p>
+      <p class="date">September 16, 2026</p>
     </div>
   </div>
   
@@ -4901,7 +4901,7 @@ F-statistic:  99.4 on 13 and 531 DF,  p-value: &lt; 2.2e-16</code></pre>
 </section>
 <section id="k-fold-cross-validation" class="level1">
 <h1><span class="math inline">\(k\)</span>-fold cross-validation</h1>
-<p>In the section above, we evaluated the model using a single holdout (i.e. a single testing set). More commonly, <span class="math inline">\(k\)</span>-fold cross-validation is used, which repeats the hold-out <span class="math inline">\(k\)</span> times. Each time <span class="math inline">\(1/\)</span>k$ of the samples are added to the testing set and the remaining samples in the training set. We’ll use a 4-fold cross-validation here (this is usually in the range of 3-10). The function <code>vfold_cv</code> allows us to set this up, which takes the following arguments:</p>
+<p>In the section above, we evaluated the model using a single holdout (i.e. a single testing set). More commonly, <span class="math inline">\(k\)</span>-fold cross-validation is used, which repeats the hold-out <span class="math inline">\(k\)</span> times. Each time 1/<span class="math inline">\(k\)</span> of the samples are added to the testing set and the remaining samples in the training set. We’ll use a 4-fold cross-validation here (this is usually in the range of 3-10). The function <code>vfold_cv</code> allows us to set this up, which takes the following arguments:</p>
 <ul>
 <li>The dataframe (<code>dat</code>)</li>
 <li>The number of folds (<code>v</code>)</li>

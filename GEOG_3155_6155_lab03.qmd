@@ -343,7 +343,7 @@ pred_test %>%
 
 # $k$-fold cross-validation
 
-In the section above, we evaluated the model using a single holdout (i.e. a single testing set). More commonly, $k$-fold cross-validation is used, which repeats the hold-out $k$ times. Each time $1/$k of the samples are added to the testing set and the remaining samples in the training set. We'll use a 4-fold cross-validation here (this is usually in the range of 3-10). The function `vfold_cv` allows us to set this up, which takes the following arguments:
+In the section above, we evaluated the model using a single holdout (i.e. a single testing set). More commonly, $k$-fold cross-validation is used, which repeats the hold-out $k$ times. Each time 1/$k$ of the samples are added to the testing set and the remaining samples in the training set. We'll use a 4-fold cross-validation here (this is usually in the range of 3-10). The function `vfold_cv` allows us to set this up, which takes the following arguments:
 
 - The dataframe (`dat`)
 - The number of folds (`v`)
