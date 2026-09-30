@@ -1,8 +1,8 @@
 ---
-title: "GEOG 5160 6160 Lab 04"
+title: "GEOG 3155 6155 Lab 04"
 author: 
-  - name: "Simon Brewer"
-    email: simon.brewer@ess.utah.edu
+  - name: "Alexander Hohl"
+    email: alexander.hohl@ess.utah.edu
     affiliations:
       - name: University of Utah
         address: 260 S Central Campus Drive
@@ -25,23 +25,24 @@ set.seed(42)
 
 # Introduction
 
-While machine learning methods have been frequently used with spatial data, there is a growing awareness of how the characteristics of these data may cause some issues. In this lab, we'll look at how more robust methods of evaluating machine learning models with spatial data, and at some approaches that can incorporate location and improve predictions.
+In this lab, we’ll look at how to implement a range of tree methods including basic classification and regression trees, random forests and boosted regression trees. We will also look at how to predict for new data and how to carry out hyperparameter tuning.
 
-We'll use a couple of datasets to illustrate these methods:
+We’ll illustrate these methods by using them to build a species distribution model for the pinon pine in the western United States. You will need the following datasets from Canvas, so download these to your datafiles folder (extract any zip files). Make a new folder for today’s class called lab04 and move these files to it (you'll need to unzip one of them):
 
-- *lsl.csv*: Location of landslide events in southern Ecuador
-- *ta.tif*: A raster file with environmental predictors
-- *data_atlantic_1998_2012.csv*: A dataset of cancer rates for counties in Atlantic states
-- *COUNTY_ATLANTIC.zip*: a shapefile for the Atlantic States
+-   *pe_df.csv*
+-   *ne_50m_admin_0_countries.zip*
+-   *current.env.nc*
+-   *future.env.nc*
 
 You will need to make sure the following packages are installed on your computer (in addition to the packages we have used in previous labs).
 
-- **terra**: working with raster data
-- **sf**: working with spatial data
-- **tmap**: making thematic maps
-- **spatialsample**: spatial sampling
-- **SpatialML**: geographic random forests
-- **FRK**: spatial basis functions
+-   **terra**: working with raster data
+-   **sf**: working with spatial data
+-   **tmap**: making thematic maps
+-   **tree**: simple classification and regression trees
+-   **rpart.plot**: better CART graphics
+-   **vip**: better variable importance plots
+-   **pdp**: partial dependency plots
 
 As a reminder, packages can be installed in RStudio by going to the 'Packages' tab and clicking on the \[Install\] button, or from the menu \[Tools\]-\> \[Install packages...\]. You can also install these from the console window by typing
 
@@ -51,9 +52,9 @@ install.packages("terra")
 
 ## Objectives
 
-- Understand how to use different cross-validation strategies for spatial data
-- Use a geographic random forest to explore spatial variations in model results
-- Incorporate location in machine learning models
+-   Understand how to set use functions to train, test and examine tree-based models
+-   Use a validation dataset to tune model hyperparameters
+-   Make and visualize predictions
 
 **It is highly recommended to use scripts or Quarto documents to store your R code - this will allow you to easily change and modify it and submit the exercise.**
 
@@ -62,513 +63,678 @@ Next load the libraries you will need for the lab. You should at this stage have
 ```{r message=FALSE}
 library(tidyverse)
 library(tidymodels)
-library(sf)
 library(terra)
+library(sf) 
 library(tmap)
+library(vip)
+library(pdp)
 ```
 
 ## Data processing
 
-Let's load the landslide data first and take a look at the content:
+Now, let's read in the known locations of *Pinus edulis* trees together with a set of pseudo-absences (locations where the species is assumed to be absent). For each of these locations, we have one of a set of 19 bioclimatic variables that we will use as features in the model (see appendix for a description of these).
 
 ```{r}
-lsl = read.csv("./datafiles/lsl.csv")
-head(lsl)
+#pe <- read.csv("datafiles/pe_df.csv")
+getwd()
+pe <- read.csv("./datafiles/pe_df.csv")
+head(pe)
 ```
 
-The first two columns show the easting and northing. The third indicates whether or not a landslide had occurred at that location (the target) and the remaining columns are features to be used in the model. See the appendix for more detail on these.
+We'll also make up an array of feature names for use in modeling, plotting, etc
 
 ```{r}
-lsl <- lsl |>
-  mutate(lslpts = as.factor(as.numeric(lslpts)))
+var_names = colnames(pe)[6:24]
+var_names
 ```
 
-We can use the `st_as_sf` function from the **sf** package to convert these to a simple features spatial object and plot. The data are from UTM 17S, so we can use the EPSG code of 32717 to set the correct reference system:
+And as a final processing step, we'll convert the presence-absence column (`pa`) to a factor (basically forcing this to be recognized as a categorical variable).
 
 ```{r}
-lsl_sf <- st_as_sf(lsl, coords = c("x", "y"), crs = 32717)
-plot(st_geometry(lsl_sf))
+pe <- pe |>
+  mutate(pa = as.factor(pa))
 ```
 
-And we can use the thematic mapping package to show the distribution of the landslide points:
+Before moving on, we'll convert this data frame to an **sf** object using `st_as_sf`. This requires for arguments the name of the data frame and the columns holding the coordinates. We'll also specify the coordinate reference system using an EPSG code (WGS84 = 4326). **sf** objects are the standard format for spatial data in R, and allow us to make some quick maps of the presence/absence values and one of the associated environmental variables (`bio7`).
 
 ```{r}
-tm_shape(lsl_sf) +
-  tm_symbols(fill = "lslpts") +
-  tm_scalebar(position = c("left", "top")) +
-  tm_compass(position = c("right", "top"))
+pe_sf = st_as_sf(pe, coords = c("longitude", "latitude"),
+                 crs = 4326)
 ```
 
-Next let's load some environmental data to make predictions. This is in a multi-layer GeoTIFF file, and we can load it using the `rast` function from **terra**:
+We'll plot the symbols using **tmap**. For this package, we can build up maps by specifying the **sf** object with `tm_shape`, and then the type of plot (we'll see more of this below). First we'll plot the sites colored by presence (1) and absence (0) which is contained in the column `pa`
 
 ```{r}
-env <- rast("./datafiles/ta.tif") 
-
-env
+tm_shape(pe_sf) +
+  tm_symbols(col="pa")
 ```
 
-To plot these, you can use **tmap**'s `tm_fill` function, where you'll need to specify the name of the layer you want to map. So to map the `log10_carea` values:
+And we can equally plot the eAnd let's plot the annual temperature range (BIO7) with a continuous color palette.
 
 ```{r}
-tm_shape(env) +
-  tm_fill(fill = "log10_carea") +
-  tm_shape(lsl_sf) +
-  tm_dots()
+tm_shape(pe_sf) +
+  tm_symbols(fill="bio7", 
+             fill.scale = tm_scale_continuous(
+               values = "viridis")
+             )
 ```
 
-This function can be used with a second function (`tm_scale_interval`) which allows you to change the color palette and number of breaks (this uses a red palette and quantile breaks):
+### Training and testing
+
+First, let's set up the training and testing set using all 19 of the bioclimatic variables, first dividing into training and testing, using an 80/20 split:
+
+```{r}
+pe_split <- initial_split(pe, prop = 0.80)
+
+dat_train <- training(pe_split)
+dat_test  <- testing(pe_split)
+```
+
+We'll define a `recipe` to select only the bioclimatic variables for use in modeling (if you take a look at the file, you'll see there are observation IDs and coordinates that we want to exclude).
+
+```{r}
+rec <- recipe(pa ~., data = dat_train) |>
+  step_select(pa, starts_with("bio"))
+
+dat_train2 = prep(rec) |> bake(dat_train)
+dat_test2 = prep(rec) |> bake(dat_test)
+```
+
+## Classification and regression trees
+
+Classification and Regression Trees (CART) are a non-linear, non-parametric modeling approach that can be used with a wide variety of data. Regression trees are used with continuous outcome data, and classification trees with binary or categorical data, but the interface for these is the same in scikit-learn. We'll build a classification model for the *Pinus edulis* data set. The base function for this in **tidymodels** is `decision_tree`, which needs the type of task (classification or regression) defined. We'll use the **rpart** *engine* to make the tree; this is the default option
+
+```{r}
+tree = decision_tree(mode = "classification",
+                     engine = "rpart")
+```
+
+Let's now fit this to the training data:
+
+```{r}
+tree_fit <- tree |> 
+  fit(pa ~ ., dat_train2)
+```
+
+We can visualize the fitted tree with an additional package (**rpart.plot**). We can't plot the `tree_fit` object directly, but we can pass it to the function `extract_fit_engine`, which extracts the necessary information, and then pass this to the plotting function:
+
+```{r}
+library(rpart.plot)
+tree_fit |>
+  extract_fit_engine() |>
+  rpart.plot(roundint = FALSE)
+```
+
+We'll now evaluate this model. First, we extract the predictions, and combine these with the `pa` column from the test set (i.e. the observed presence and absences)
+
+```{r}
+pred_test <- predict(tree_fit, dat_test2) |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
+```
+
+And we can use this to make a confusion matrix:
+
+```{r}
+pred_test |>
+  conf_mat(pa, .pred_class)
+```
+
+And calculate the accuracy of predictions:
+
+```{r}
+pred_test |>
+  accuracy(pa, .pred_class)
+```
+
+### Tuning
+
+Let's try to improve on this model by tuning it to find the best set of hyperparameters to limit overfitting. You can get the list of available hyperparameters for any **tidymodels** model looking at the `args` of the original object. For a decision tree, there are three main hyperparameters:
+
+```{r}
+tree$args
+```
+
+Tuning with tidymodels requries a series of steps:
+
+-   Define the tuning *specification*
+-   Define the tuning grid
+-   Define a strategy for validation (i.e. validating different combinations of hyperparameter values)
+-   Run the tuning and explore the outcomes
+
+The goal of the tuning specification is to define which of the hyperparameters we want to tune. In **tidymodels**, we use the algorithm function (here: `decision_tree`) to set these. Here, we'll tune the minimum number of samples to split a node (`min_n`) and the depth of the tree (the maximum number of splits in a single branch). Rather than set these to given value, we set them to the `tune()` function - essentially a placeholder to indicate that they will be tuned. In addition, we define the engine and mode of the tree.
+
+```{r}
+tune_spec <- 
+  decision_tree(
+    min_n = tune(),
+    tree_depth = tune()
+  ) %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification")
+```
+
+Next, we'll define the sampling grid. **tidymodels** comes with an additional package called **dials** that has functions to define potential values for common hyperparameters. For example, the function `min_n` has the following range:
+
+```{r}
+min_n()
+```
+
+And the default range for tree depth:
+
+```{r}
+tree_depth()
+```
+
+We'll now use these to set up a regular sampling grid. We'll use 5 values for each of these, giving us 5 \* 5 = 25 possible hyperparameter sets:
+
+```{r}
+tree_grid <- grid_regular(min_n(),
+                          tree_depth(),
+                          levels = 5)
+tree_grid
+```
+
+Next we'll set up the validation strategy. We'll use a 5-fold cross-validation, meaning that each combination of hyperparameters will be tested 5 times. As a reminder - this will not use the testing set we created earlier so that this remains independent.
+
+```{r}
+dat_folds <- vfold_cv(dat_train2, v = 5)
+```
+
+With all that set up, we can now run the tuning. There's a fair amount going on here, so let's step through it. The function to run the tuning is called `tune_grid`, and we use the following arguments
+
+-   The tuning specification `tune_spec`
+-   A formula defining the target and features (`pa ~ .`, where the `.` indicates using all other variables as features)
+-   The grid of hyperparameter values to test
+-   The metrics to be calculated for each fold and each combination of hyperparameters
+-   
+
+```{r}
+tree_res <- 
+  tune_grid(
+    tune_spec,
+    pa ~ .,
+    grid = tree_grid,
+    resamples = dat_folds,
+    metrics = metric_set(accuracy, roc_auc)
+  )
+```
+
+Now we can start to explore the results. In their raw form, these contain all the values in a set of columns:
+
+```{r}
+tree_res
+```
+
+But we can summarize these as follows
+
+```{r}
+collect_metrics(tree_res)
+```
+
+More usefully, we can plot these to show the changes in accuracy and AUC:
+
+```{r}
+autoplot(tree_res)
+```
+
+These show that the biggest impact on performance is `tree_depth`, with better accuracy at depths of 4 or more. There's is relatively less difference between the node size values, but values around 11 are probably optimal.
+
+\[Note that we could carry out a second tuning at this point with a more precise grid (e.g. between 8 and 12 for `min_n`) to better identify the values.\]
+
+Let's see what came out as the optimal set of hyperparameter (the helper function `select_best` extracts the parameters with the highest value of a given metric):
+
+```{r}
+best_param <- select_best(tree_res, metric = "accuracy") 
+best_param
+```
+
+We can then use another helper function `finalize_model` to create a final model with these parameters, and fit to the full training set:
+
+```{r}
+tree_final <- finalize_model(tune_spec, best_param)
+tree_fit <- fit(tree_final, pa ~ ., dat_train2)
+```
+
+And now, we can calculate the accuracy for this model:
+
+```{r}
+pred_test <- predict(tree_fit, dat_test2) |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
+pred_test |>
+  accuracy(pa, .pred_class)
+```
+
+We'll also calculate the ROC AUC. As this is not based on a confusion matrix (and associated threshold for defining 0's and 1's), we need to predict the *probabilities* not the classes. Note that for this outcome, this gives us two predictions - the probability of being a 0 *and* the probability of being a 1
+
+```{r}
+pred_test <- predict(tree_fit, dat_test2, type='prob') |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
+pred_test
+```
+
+We can then use this get the AUC score. Rather confusingly, this expects that the first class is the 'event', by default. For our data, this means that it considers the 0 as the event of interest, not the 1. To fix this, we add the argument `event_level='second'`.
+
+```{r}
+roc_auc(pred_test, pa, .pred_1, event_level = 'second')
+```
+
+And we get a final value of `r round(roc_auc(pred_test, pa, .pred_1, event_level = 'second')$.estimate, 4)`.
+
+We can also plot the final tree:
+
+```{r}
+tree_fit %>%
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE)
+```
+
+## Random forest
+
+Next, we'll build a random forest for the Pinus data using the `rad_forest` function. We'll go straight to tuning this, so let's set up a model and check the hyperparameters. Note that the default engine is `ranger` - this is usually a good choice as it is designed to run in parallel with a fairly notable speed up in computation time
+
+```{r}
+rf = rand_forest() |> 
+  set_engine("ranger") |>
+  set_mode("classification")
+
+rf$args
+```
+
+We'll now set up the tuning strategy. This will follow the same steps as above, but with a difference in the hyperparameters. We'll tune
+
+-   `mtry`: the number of features used for split in a tree in the forest
+-   `trees`: the number of trees in the forest
+-   `min_n`: the minimum number of samples for splitting
+
+Note that unlike the example above, where we used the default ranges for each hyperparameter, we manually set these while making the tuning grid using the `range` argument. Again, we'll use 5 levels for each giving us $5 \times 5 \times 5 = 125$ combinations, which will be evaluated with a 5-fold cross-validation (a total of 625 random forests)
+
+```{r}
+tune_spec_rf <- 
+  rand_forest(
+    mtry = tune(),
+    trees = tune(),
+    min_n = tune()
+  ) |> 
+  set_engine("ranger", importance="permutation") |>
+  set_mode("classification")
+
+## Tuning grid (see also grid_random)
+rf_grid <- grid_regular(mtry(range = c(2, 10)),
+                        trees(range = c(100, 500)),
+                        min_n(range = c(2, 8)),
+                        levels = 5)
+rf_grid
+
+dat_folds <- vfold_cv(dat_train2, v = 5)
+```
+
+The following line of code will set up R to use multiple cores on your computer (you can skip this)
+
+```{r}
+## Set up for parallel processing
+doParallel::registerDoParallel()
+```
+
+And finally, we can run the tuning:
+
+```{r}
+## Run tuning
+rf_res <- 
+  tune_grid(
+    tune_spec_rf,
+    pa ~ .,
+    grid = rf_grid,
+    resamples = dat_folds,
+    metrics = metric_set(accuracy, roc_auc),
+    control = control_grid(save_workflow = TRUE)
+  )
+
+rf_res
+```
+
+As before, we'll summarize the results and plot them:
+
+```{r}
+collect_metrics(rf_res)
+```
+
+```{r}
+autoplot(rf_res)
+```
+
+The results for accuracy are quite noisy, but there are some easier to spot trends in the AUC scores (botton panels). In general, the AUC scores are higher for small values of `mtry` (the x-axis) and for smaller node sizes (left panels). Let's extract and print the best set:
+
+```{r}
+best_param <- select_best(rf_res, metric = "roc_auc") 
+best_param
+```
+
+Now, let's make a final model with these values, and evaluate with the test set:
+
+-   Accuracy
+
+```{r}
+rf_final <- finalize_model(tune_spec_rf, best_param)
+
+rf_fit <- fit(rf_final, pa ~ ., dat_train2)
+
+pred_test <- predict(rf_fit, dat_test2) |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
+
+pred_test |>
+  accuracy(pa, .pred_class)
+```
+
+-   AUC
+
+```{r}
+pred_test <- predict(rf_fit, dat_test2, type='prob') |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
+
+pred_test |>
+  roc_auc(pa, .pred_1, event_level = 'second')
+```
+
+### Variable importance scores
+
+Next we'll plot the permutation-based variable importance for this model. As a reminder, variable importance is a measure of how much worse a model becomes when we scramble the values of one of the features. The model is used to predict the outcome for some test data (here the out-of-bag samples) twice: once with the original values of the feature and once with randomly shuffled values. If there is a large difference in the skill of the model, this feature is important in controlling the outcome.
+
+We'll use the add-on library **vip** to plot these. This does not work with the **tidymodels** output directly, but we can again use `extract_fit_engine` to get the information we need:
+
+```{r}
+rf_fit_2 <- rf_fit %>%
+  extract_fit_engine() 
+
+library(vip)
+vip(rf_fit_2)
+```
+
+This plot shows the score for the 10 most important features (you can change this with the `num_features` argument). Each bar represents a single feature, and the length of the bar it's importance. High values indicate the features that were the most useful in predicting the outcome.
+
+### Partial dependency plots
+
+The variable importace plot tells us which features are the most important, but not how these change our predictions. We can look at the form of the relationship between the occurrence of the pine and this feature (and any other one) using a partial dependency plot. This shows changes in the outcome across the range of some feature (with all other features effectively held constant). Here, we'll use the `partial()` function from the the **pdp** package to produce the plot. As arguments, this requires the model, the DataFrame or array used to build the model, and the feature that you want to show. This will take an array of feature, allowing you to plot several dependency plots together. We'll start with the dependency for the most important feature (`bio17`; precipitation of driest quarter). Again, we need to specify which of the two possible class values is the 'event'. We want this to be the 1's (the presences), which is the second class (again, very confusingly)
+
+```{r}
+library(pdp)
+
+partial(rf_fit_2, "bio17", train = dat_train2,
+        plot = TRUE, prob = TRUE, which.class = 2)
+
+partial(rf_fit_2, "bio1", train = dat_train2,
+        plot = TRUE, prob = TRUE, which.class = 2)
+```
+
+You can also plot the dependency over two features as a heatmap (not run here):
 
 ```{r eval=FALSE}
-tm_shape(env) +
-  tm_fill(fill = "log10_carea", 
-           fill.scale = tm_scale_intervals(
-             values = "brewer.reds", 
-             style = "quantile")
-          ) +
-  tm_shape(lsl_sf) +
-  tm_dots()
+partial(rf_fit_2, c("bio1", "bio17"), train = dat_train2,
+        plot = TRUE, prob = TRUE, which.class = 2)
 ```
 
-# Spatial prediction
+## Gradient boosted trees
 
-First, let's build a simple model using a classic train/test split (80/20) and evaluate it. First create the training/test split. Note that the data is well balanced (equal numbers of 1's and 0's) so we don't need to worry about stratifying the sample:
+We will now build a gradient boosted tree model for the Pinus data. In contrast to random forests that build a set of individual weak trees, boosted regression trees (BRTs) start with a single weak tree and iteratively improve on this. This is done by targeting the residuals from the previous set of models and trying to model that in the next tree. While this can make these methods very powerful, it is easy for them to overfit the data, and hyperparameter tuning becomes very important here.
+
+With the exception of the different hyperparameters, the code follows the examples above. This is, hopefully, where using the **tidymodels** approach starts to shine - if you want to change algorithms, you can reuse and modify existing code easily.
+
+-   First get the hyperparameter list
 
 ```{r}
-library(tidymodels)
-dat_split <- initial_split(lsl, prop = 0.80)
+gbt = boost_tree() |> 
+  set_engine("xgboost") |>
+  set_mode("classification")
 
-dat_train <- training(dat_split)
-dat_test  <- testing(dat_split)
+gbt$args
 ```
 
-Next, we'll build a model. We're going use a random forest without tuning, so we can simply:
-
-- Set up the formula to define the target (`lslpts`) and the features
-- Instantiate a random forest object
-- Fit the model using the training set
+-   Set up tuning specification
 
 ```{r}
-lsl_f <- lslpts ~ slope + cplan + cprof + elev + log10_carea
-
-rf <- rand_forest(mode = "classification")
-
-rf_fit <- rf |> 
-  fit(lsl_f, dat_train)
+tune_spec_gbt <- 
+  boost_tree(
+    learn_rate = tune(),
+    trees = tune(),
+    min_n = tune()
+  ) |> 
+  set_engine("xgboost") |>
+  set_mode("classification")
 ```
 
-We'll get a first evaluation here using the AUC:
+-   Set up tuning grid
 
 ```{r}
-y_test_pred <- predict(rf_fit, dat_test, type = 'prob') |>
-  bind_cols(dat_test |> dplyr::select(lslpts))
-
-roc_auc(y_test_pred, lslpts, .pred_1, event_level = 'second')
+gbt_grid <- grid_regular(learn_rate(),
+                         trees(range = c(200, 1000)),
+                         min_n(range = c(2, 8)),
+                         levels = 5)
+gbt_grid
 ```
 
-We get an AUC of around 0.88, which indicates a pretty good model. We'll dig into this more below.
-
-Next, let's predict landslide susceptibility for the study region using the raster images we loaded above. In the previous lab, we did this by extracting all the values to a data frame, and then predicting. An easier way is to use the `predict` function that comes with the **terra** package, which allows direct prediction on raster layers. We'll do this below, but a few things to note:
-
-- We use the `::` notation to force R to use the `predict` function from the **terra** package (there are other packages with the same function name)
-- We use the fitted model from the tidymodels object (`rf_fit$fit`)
-- We set the `type` to `response` to get predictions on a 0-1 scale
-- Last, and possibly most important, the input raster (`env`) must have the same names for the layers as the columns in the data frame used to fit the model
-
-Let's now predict:
+-   Validation strategy
 
 ```{r}
-lsl_pred = terra::predict(env, model = rf_fit$fit, 
-                          type = "response", na.rm = TRUE)
+dat_folds <- vfold_cv(dat_train2, v = 5)
 ```
 
-And plot. Note that this gives two rasters as output: a) the probability of the *absence* of a landslide and b) the probability of *presence*, so we'll plot the second one here (`X1`)
+-   Run tuning
 
 ```{r}
-tm_shape(lsl_pred[["X1"]]) + 
-  tm_raster() + 
-  tm_shape(lsl_sf) + 
-  tm_dots()
+gbt_res <- 
+  tune_grid(
+    tune_spec_gbt,
+    pa ~ .,
+    grid = gbt_grid,
+    resamples = dat_folds,
+    metrics = metric_set(accuracy, roc_auc),
+    control = control_grid(save_workflow = TRUE)
+  )
+
+gbt_res
 ```
 
-# Spatial cross-validation
-
-Now let's dig a little further into the cross-validation of this model. The AUC value we got above is from a single hold-out, ignoring the spatial distribution of the observations.
-
-First, let's re-run this as a 5-fold cross-validation to get a more robust estimate. For this we:
-
-- Define a recipe using the formula from above
-- Instantiate a random forest (we could simply reuse the code above, but adding this here helps clarify what is going on)
-- Define and create the folds
-- Link all of this together into a workflow
-- Run the cross-validation and check the results
+-   Summarize
 
 ```{r}
-rec <- recipe(lslpts ~ slope + cplan + cprof + elev + log10_carea, lsl)
-
-rf <- rand_forest(mode = "classification")
-
-nfolds = 5
-folds <- vfold_cv(lsl, v = nfolds)
-
-workflow <- workflow() |>
-  add_recipe(rec) |>
-  add_model(rf)
-
-results <- workflow |>
-  fit_resamples(resamples = folds, 
-                metrics = metric_set(accuracy, roc_auc))
-
-collect_metrics(results)
+collect_metrics(gbt_res)
 ```
 
-And we get a slightly lower, but more robust AUC estimate. However, we still haven't accounted for the spatial dependency in the data. This means that the value we have is somewhat reliant on the spatial correlation between the training and test set, as the observations are mixed. This means that our AUC value is really telling us about how well the model predicts *within* existing observations, in other words, how well it can interpolate.
-
-A different test is how well our model would work in an area where we know the features, but we don't have any observations of landslides (or non-landslides). This will tell us how well the model works at predicting *outside* existing observations, or how well it can extrapolate. To test this, we need to use a spatial sampling method that will divide the data into contiguous training and testing regions. In a spatial $k$-fold, we divide the data into $k$ regions, set one as testing and the others as training, fit and evaluate a model and repeat.
-
-We'll use the **spatialsample** library to create the sampling scheme. This has a number of options - we'll use a clustering approach, where clusters of locations are made based on the distance between them.
-
-Let's go ahead and build this now. Note that we have to pass the `sf` object we made earlier (so that the function can find the coordinates):
+-   Plot (note the impact of the learning rate)
 
 ```{r}
-library(spatialsample)
-spfolds <- spatial_clustering_cv(data = lsl_sf, 
-                                 v = nfolds)
+autoplot(gbt_res)
 ```
 
-This library comes with an `autoplot` function to quickly visualize the results:
+-   Pick best parameters and train final model
 
 ```{r}
-autoplot(spfolds)
+best_param <- select_best(gbt_res, metric = "accuracy") 
+gbt_final <- finalize_model(tune_spec_gbt, best_param)
+gbt_fit <- fit(gbt_final, pa ~ ., dat_train2)
 ```
 
-An alternative is spatial block sampling, where the study region is divided into regular grid. All observations in a grid box are considered as part of a fold, with several boxes making the entire fold:
+-   Evaluate (accuracy)
 
 ```{r}
-spblock <- spatial_block_cv(data = lsl_sf, 
-                            v = nfolds)
-autoplot(spblock)
+pred_test <- predict(gbt_fit, dat_test2) |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
+pred_test |>
+  accuracy(pa, .pred_class)
 ```
 
-We'll now use the first set of folds (the cluster sampling) to cross-validate the model. This integrates well with the **tidymodels** approach we have used so far, with the only difference that
-
-- We need to specify the `sf` object in the recipe, not the data frame
-- We use `spfolds` in the resampling.
-
-I've copied the full code again here, so that it is easier to see what is going on.
+-   Evaluate (AUC)
 
 ```{r}
-rec <- recipe(lslpts ~ slope + cplan + cprof + elev + log10_carea, lsl_sf)
+pred_test <- predict(rf_fit, dat_test2, type='prob') |>
+  bind_cols(dat_test2 |> dplyr::select(pa))
 
-rf <- rand_forest(mode = "classification")
-
-workflow <- workflow() |>
-  add_recipe(rec) |>
-  add_model(rf)
-
-results <- workflow |>
-  fit_resamples(resamples = spfolds, 
-                metrics = metric_set(accuracy, roc_auc))
-
-collect_metrics(results)
+pred_test |>
+  roc_auc(pa, .pred_1, event_level = 'second')
 ```
 
-You should see here that the AUC decreases substantially, indicating less predictive power when extrapolating.
+## Prediction
 
-# Using location in machine learning
+In a final step, we'll use this model to predict the probability of Pinus edulis occurring throughout western N. America (note that this is usually referred to as predicting the *suitability* for the species). We'll use the random forest model for this (but feel free to switch it for any of the other ones).
 
-We'll now move on to exploring the use of location in machine learning. We'll look at this in three ways
+First, we'll estimate the optimal threshold for prediction. As a reminder, the ROC curve assesses how well the model differentiates between 0's and 1's for different thresholds (the threshold is how a value of 0 or 1 is set from a value *between* 0 and 1).
 
-- Geographical random forest (GRF)
-- Using coordinates as features
-- Spatial basis functions
-
-We'll also use a different data set here, with a continuous outcome, as the current GRF implementation does not work (well) with with binary outcomes.
-
-The file *data_atlantic_1998_2012.csv* contains information on cancer rates from around 660 counties in the eastern part of the US. Let's load that here as well as a shapefile containing the county polygons:
+The ROC curve (used to calculate the AUC) can be used to define this. First, let's calculate this (with `roc_curve`) and plot it. The plot is produced using the false positive rate on the x-axis (FPR; the number of 0's incorrectly predicted) and the true positive rate on the y-axis (TPR; the number of 1's correctly predicted)
 
 ```{r}
-atl <- st_read("./datafiles/COUNTY_ATLANTIC.shp")
-atl
+pred_test <- predict(rf_fit, dat_test2, type = "prob") |>
+  bind_cols(dat_test |> dplyr::select(pa))
+
+roc_test <- roc_curve(pred_test, pa, .pred_0)
+autoplot(roc_test)
+```
+
+The optimal threshold is found where the TPR (sensitivity) is high and the FPR (1-specificity) is low. We can get these from the output of `roc_curve`
+
+```{r}
+roc_test
+```
+
+And we can find the optimum as the maximum difference between TPR and FPR, i.e. `max(sensitivity - (1 - specificity))`
+
+```{r}
+diff = roc_test$sensitivity - (1-roc_test$specificity)
+plot(roc_test$.threshold, diff)
 ```
 
 ```{r}
-cancer <- read.csv("./datafiles/data_atlantic_1998_2012.csv")
-head(cancer)
+thr = roc_test$.threshold[which.max(diff)]
+thr
 ```
 
-Both the shapefile and the cancer data have the county FIPS code, so we can use this to merge the two datasets together, which allows us to map out the cancer rates, showing high rates in the south and western part of the region:
+### Predicting with new data
+
+#### Current climate
+
+Now we tested and tuned our models, we can use them for prediction. First, we'll load a set of coastlines to use in plotting.
 
 ```{r}
-atl_cancer <- merge(atl, cancer, by = "FIPS")
+ne = st_read("./datafiles/ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp", quiet=TRUE)
+ne_geom = st_geometry(ne)
 ```
+
+For species distribution models, we generally want to predict the suitability for our species using a gridded dataset of the environmental variables used to build the model. The data are available in a NetCDF file called *current.env.nc*, which you should have downloaded. We can read this in (and work with it) using the `rast` function from the **terra** package:
 
 ```{r}
-tm_shape(atl_cancer) +
-  tm_fill(fill = "Cancer", 
-           fill.scale = tm_scale_intervals(
-             values = "viridis", 
-             style = "fisher")
-          ) +
-  tm_scalebar() + tm_compass()
+curr_env = rast("./datafiles/current_env.nc")
+curr_env
 ```
 
-## Geographical random forest
-
-Let's start this section by building a GRF with these data. To keep things simple here and below, we'll just use the pollutant variables as features (`PM25`, `NO2` and `SO2`). The GRF function does not use the `sf` object that we made earlier, but instead uses the original `cancer` dataframe and a second dataframe with the coordinates of each spatial location. We'll extract this from the `sf` object by finding the centroids, and then the coordinates of these
+There's quite a bit there - but this is a spatial raster: 480 columns and 720 rows. There are 19 levels, corresponding to the 19 bioclimate variables we used as features in our model. Let's plot the first level (`bio1`) to see what it looks like. The second and third lines of code overlay the coastline and sample points respectively.
 
 ```{r}
-atl_crds <- st_coordinates(st_centroid(atl_cancer))
+plot(curr_env[[1]])
+plot(ne_geom, add = TRUE)
+plot(st_geometry(pe_sf), add = TRUE, pch = 16, cex = 0.5)
 ```
 
-Now we can fit the model. We won't try and tune this here, but instead run it with an adaptive kernel that uses the 50 closest locations to build each model in a moving window (you might want to try playing with the `bw` argument to see how this affects the results). Note the other arguments:
-
-- The formula defining the relationship between variables
-- The dataframes holding the data (`dframe`) and coordinates (`coords`)
-
-```{r warning=FALSE, results='hide', message=FALSE}
-library(SpatialML)
-cancer_grf <- grf(Cancer ~ PM25 + NO2 + SO2,
-    dframe = cancer, kernel = 'adaptive', bw = 50,
-    coords = atl_crds)
-```
-
-The function will give you quite a lot of output (you can turn this off with `print.results=FALSE`). The routine starts by fitting a global model (i.e. with all the observations) and then fits local models to each observation using the kernel we defined in the function. The output contains a summary of both of these, and we can use this contrast the global and local approaches. Two useful numbers are a) the global and local R2 and b) the global and local MSE.
-
-More usefully, we can start to visualize the results. First we'll explore the importance of the three features we used in the model. As a remidner, this is a measure of the loss of predictive power when one of the variables is randomly shuffled. Let's start by plotting the importance scores for the global model:
+Currently, we can't predict directly onto the grid, so as a work around, we'll first extract all the gridded values into dataframe, then predict using that. Note we need to set the column names of the data frame to match the names of the features in the model:
 
 ```{r}
-library(vip)
-cancer_grf$Global.Model
-vip(cancer_grf$Global.Model)
+curr_env_df = as.data.frame(curr_env, cells=TRUE)
+colnames(curr_env_df) <- c("cell", colnames(dat_train2)[-1])
+prob_df = predict(rf_fit, curr_env_df, type="prob")
 ```
 
-Next, let's get the local importance scores. In the model output, there is a dataframe called `Local.Variable.Importance` which (unsurprisingly) holds the importance scores for each model (for each location). A second dataframe (`LGofFit`) holds goodness of fit scores for each location and we'll use this to visualize variations in the R2:
+Now we can create a new spatial raster, by a) copying one of the inputs, and b) replacing the values with the predicted probabilities:
 
 ```{r}
-head(cancer_grf$Local.Variable.Importance)
-head(cancer_grf$LGofFit)
+curr_prob = curr_env[[1]]
+curr_prob[curr_env_df$cell] <- prob_df$.pred_1
 ```
 
-Let's extract these and add them to our `sf` object:
+And finally, plot
 
 ```{r}
-atl_cancer$localR2 <- cancer_grf$LGofFit$LM_Rsq100 
-atl_cancer$vip_PM25 <- cancer_grf$Local.Variable.Importance$PM25
-atl_cancer$vip_NO2 <- cancer_grf$Local.Variable.Importance$NO2
-atl_cancer$vip_SO2 <- cancer_grf$Local.Variable.Importance$SO2
+plot(curr_prob)
+plot(ne_geom, add = TRUE)
 ```
 
-And finally map everything:
+This shows that model captures the current distribution well, but also predicts a large area of suitability in the north-west (suggesting that it is climatically suitable given the variables we've looked at).
 
-```{r message=FALSE, warning=FALSE}
-tm_shape(atl_cancer) + 
-  tm_fill(c("localR2", 
-            "vip_PM25", "vip_NO2", "vip_SO2"))
-```
-
-A few things to note from these maps:
-
-- The local R2 values vary a lot (with some regions that have negative values). This can be interpreted as a map of where the model is doing a reasonable job (green) and where it fails (red). The low values indicate that other variables may be important in producing this model
-- The importance scores for the three features largely follow the same pattern (high importance around metropolitan centers, low elsewhere). This is not too surprising as pollutant values tend to correlate pretty strongly.
-
-## Using coordinates as features
-
-Next, we'll explore the use of coordinates as features. Conceptually, we are trying to improve the model outcome by incorporating some measure of spatial dependency or autocorrelation between locations. This helps to address models that tend to over- or under-estimate systematically in space. To illustrate this point, we'll first make a random forest model using all the data:
+We can also use the threshold we calculated earlier to divide this map into a binary map of suitable and unsuitable areas:
 
 ```{r}
-rf <- rand_forest(mode = "regression")
-
-rf_fit <- rf |> 
-  fit(Cancer ~ PM25 + NO2 + SO2, cancer)
+curr_pa = curr_prob > thr
+plot(curr_pa)
+plot(ne_geom, add = TRUE)
 ```
 
-Now predict and merge into the `sf` object:
+#### Future climate
+
+The previous maps are based on current (or at least end of last century) estimates of climate. We can equally predict for other time periods when we have data available. We also have the same data for the future (2080 under a high emissions climate scenario), so let's load that as well. We can go through the same steps to produce a map showing projected suitability for this species in 2080
 
 ```{r}
-atl_cancer$y_hat = predict(rf_fit, cancer)$.pred
+future_env = rast("./datafiles/future_env.nc")
+
+future_env_df = as.data.frame(future_env, cells=TRUE)
+colnames(future_env_df) <- c("cell", colnames(dat_train2)[-1])
+
+prob_df = predict(rf_fit, future_env_df, type="prob")
+
+future_prob = future_env[[1]]
+future_prob[future_env_df$cell] <- prob_df$.pred_1
+plot(future_prob)
+plot(ne_geom, add = TRUE)
 ```
 
-Calculate the error as prediction - observation and plot:
+And again, we can threshold this to get areas of suitability/unsuitability
 
 ```{r}
-atl_cancer$error = atl_cancer$y_hat - atl_cancer$Cancer
-tm_shape(atl_cancer) +
-  tm_fill("error") +
-  tm_scalebar() + tm_compass()
+future_pa = future_prob > thr
+plot(future_pa)
+plot(ne_geom, add = TRUE)
 ```
 
-And these results show that systematic error in the model (note the region of negative values in the west and south, and positive values in the north-west). Before including the coordinates in a model, let's run a 5-fold cross-validation on this model to get a reference RMSE and $R^2$. I've listed all the steps in the next block of code for clarity:
+#### Distribution change
 
-- Set up the recipe (no data processing)
-- Instantiate the model
-- Define the cross-validation strategy
-- Combine this into a workflow
-- Run the cross-validation and print results
+As a final result, we can use the two binary maps to more easily visualize how the distribution of suitable areas is projected to change. By subtracting the current binary distribution from the future binary distribution, we end up with a map with three values:
+
+-   1: new areas of suitability
+-   0: No change
+-   -1: loss of suitability
 
 ```{r}
-rec <- recipe(Cancer ~ PM25 + NO2 + SO2, cancer)
-
-rf <- rand_forest(mode = "regression")
-
-nfolds = 5
-folds <- vfold_cv(cancer, v = nfolds)
-
-workflow <- workflow() |>
-  add_recipe(rec) |>
-  add_model(rf)
-
-results <- workflow |>
-  fit_resamples(resamples = folds, 
-                metrics = metric_set(rmse, rsq))
-
-collect_metrics(results)
+plot(future_pa - curr_pa)
+plot(ne_geom, add = TRUE)
 ```
-
-Giving us an RMSE of around `r round(collect_metrics(results)$mean[1], 2)`, and an $R^2$ of `r round(collect_metrics(results)$mean[2], 2)`.
-
-Now let's re-run this with coordinates included (these are in the `x` and `y` columns or we could use the centroid coordinates we extracted earlier):
-
-```{r}
-rec <- recipe(Cancer ~ PM25 + NO2 + SO2 + x + y, cancer)
-
-rf <- rand_forest(mode = "regression")
-
-nfolds = 5
-folds <- vfold_cv(cancer, v = nfolds)
-
-workflow <- workflow() |>
-  add_recipe(rec) |>
-  add_model(rf)
-
-results <- workflow |>
-  fit_resamples(resamples = folds, 
-                metrics = metric_set(rmse, rsq))
-
-collect_metrics(results)
-```
-
-And we get a pretty substantial improvement in model performance, with around a 2 point drop in RMSE and a doubling of $R^2$.
-
-## Spatial basis functions
-
-As a final step, we'll re-fit this model using spatial basis functions to represent location. As a reminder, these functions are designed to encode relative location (i.e. the proximity of each observation to the others) in a way that maximizes the signal-to-noise ratio in a memory efficient manner. These are best suited for large spatial and spatio-temporal datasets; we'll use them here more as a demonstration of how to create and use these.
-
-We'll use these here to try and further improve our cancer model. R has an add-on library (**FRK**) that has a function to easily create these for spatial data. It currently only works with an oldr version of R's spatial objects, so first, let's convert our existing `sf` object to that format:
-
-```{r}
-atl_cancer_sp <- as_Spatial(atl_cancer)
-```
-
-Next, load the **FRK** library and use the `auto_basis` function to generate the basis functions for the cancer dataset:
-
-```{r}
-library(FRK)
-atl_basis <- auto_basis(data = atl_cancer_sp)
-```
-
-And we can quickly visualize the results:
-
-```{r}
-show_basis(atl_basis) +
-  coord_fixed() +
-  geom_sf(data = atl_cancer, fill = NA, color = "red")
-```
-
-By default, this places three levels of basis functions from low-resolution to capture large scale spatial patterns (large circles) to high-resolution to capture fine-scale patterns (smallest circles). The red polygons show the distribution of the counties from the cancer dataset.
-
-If you type the name of the basis object (`atl_basis`) it will give you an overview. This shows a total of 1428 functions that we could relate our observations too. We'll make some adjustments to this:
-
-- We'll only use two resolutions (`nres=2`)
-- We'll prune the basis functions. This removes all basis functions that have less than `prune` observations
-
-Note that you can also adjust the resolution of the functions. For example, adding the argument `regular=2` will double the resolution. Alternatively, setting `regular=0` will add irregular basis functions based on the data density.
-
-```{r}
-atl_basis <- auto_basis(data = atl_cancer_sp, 
-                        nres = 2, prune = 2)
-
-show_basis(atl_basis) +
-  coord_fixed() +
-  geom_sf(data = atl_cancer, fill = NA, color = "red")
-```
-
-Now, we need to extract the value of each basis function for each observation. The closer an observation is, then the higher the value will be, and this is then used to spatially correlate observations (i.e. observations who have similar values on all basis functions must be close together).
-
-We do this in two steps. First, we use the function `eval_basis` to get the values for each observation as a matrix. We add column names starting with `b` to this to identify each function
-
-```{r}
-basis_mat <- as.matrix(eval_basis(atl_basis, atl_cancer_sp))
-colnames(basis_mat) <- paste0("b", 1:ncol(basis_mat))
-dim(basis_mat)
-```
-
-The resulting matrix has the same nunber of rows as observations and same number of columns as basis functions. Next, we use R's `cbind` function to merge this with the original cancer dataset to make a new dataframe (`atl2`. Then we drop all unused predictors.
-
-```{r}
-atl2 <- cbind(cancer, basis_mat)
-
-atl2 <- atl2 |>
-  select(-FIPS, -x, -y, Smoking, Poverty)
-```
-
-Finally, we repeat out cross-validation exercise from above to estimate the predictive power of the model. Note that we use a much larger number of trees in the random forest, and a high number for the features used at each split, given the size of the new dataset
-
-```{r}
-rec <- recipe(Cancer ~ ., atl2)
-
-rf <- rand_forest(mode = "regression", trees = 2000, mtry = 20)
-
-nfolds = 5
-folds <- vfold_cv(atl2, v = nfolds)
-
-workflow <- workflow() |>
-  add_recipe(rec) |>
-  add_model(rf)
-
-results <- workflow |>
-  fit_resamples(resamples = folds, 
-                metrics = metric_set(rmse, rsq))
-
-collect_metrics(results)
-```
-
-And we get another small improvement in the model. Note that we have not tuned any of these models (or the basis functions), and it's is possible that better performance could be achieved in practice.
 
 # Exercise
 
-In the cancer dataset, there are two possible predictor variables that we did not use above (poverty rates `Poverty` and smoking rates `Smoking`). For the exercise, you will need run a new analysis that includes these. There are three options given below; students in GEOG 5160 will need to do one of these, students in GEOG 6160 will need to do two.
+For the exercise, you will need to submit two things:
 
-1.  Use the cancer dataset to carry out a non-spatial and spatial cross-validation, following the example above. This will be a regression task, and you should include all the possible predictors (poverty, smoking and air pollutants). You can use a random forest, or any of the other algorithms we have looked at so far. Report the RMSE and $R^2$ for both cross-validation methods, and write a short statement that explains in simple terms what these mean (1-2 sentences)
-2.  Make a new geographical random forest model that includes the variables mentioned above. Your answer should include a) a variable importance plot based on the global model; b) maps of the importance scores for all variables and the local $R^2$; c) a short description (2-4 sentences) of the spatial patterns you observe
-3.  Make a new model with spatial basis functions that includes the variables mentioned above. You should try at least two different basis functions setups (I'd recommend that at least one uses the irregular basis functions described in the section above). Your answer should include a) a figure showing the distribution of the basis functions you used; b) cross-validated RMSE and $R^2$ values; c) a short statement as to whether the basis functions have improved the model (1-2 sentences)
+-   A table listing the AUC and accuracy for the three different algorithms (decision trees, random forest and boosted regression). You should give these values based on predictions for the *test* dataset using the final model.
+-   A map showing predicted *probability* of Pinus edulis presence under *current* environmental conditions using *either* the decision tree model or the boosted regression
 
-Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and (ideally) the compiled HTML file, should be submitted to Canvas by Feb 19th. Please use the following naming convention: `Lab04_lastname`.
+Students enrolled in 6155 should also provide
 
-# Appendix 1: Datafiles
+-   A map showing predicted *probability* of Pinus edulis presence under *future* environmental conditions using the same model as in part 2
+-   A map showing the difference between the future and current predicted presence for the same model
 
-## *lsl.csv*
+Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and (ideally) the compiled HTML file, should be submitted to Canvas. Please use the following naming convention: `Lab04_lastname`.
 
-- `x`: easting (m)
-- `y`: northing (m)
-- `lslpts`: presence or absence of landslide (`[0,1]`)
-- `slope`: slope angle (degrees)
-- `cplan`: plan curvature (rad m−1) expressing the convergence or divergence of a slope and thus water flow
-- `cprof`: profile curvature (rad m-1) as a measure of flow acceleration, also known as downslope change in slope angle
-- `elev`: elevation (m a.s.l.) as the representation of different altitudinal zones of vegetation and precipitation in the study area
-- `log10_carea`: the decadic logarithm of the catchment area (log10 m2) representing the amount of water flowing toward a location
+# Appendix 1: Bioclimate variables
 
-## *ta.tif*
-
-Raster dataset with same predictor variables as *lsl.csv*
-
-## *data_atlantic_1998_2012.csv*
-
-- `FIPS`: County FIPS code
-- `x`: Easting (m)
-- `y`: Northing (m)
-- `Cancer`: Cancer mortality rate / 100,000
-- `Poverty`: Poverty rate (% below poverty level)
-- `Smoking`: Smoking rate (%)
-- `PM25`: Annual mean PM2.5 concentration
-- `NO2`: Annual mean NO2 concentration
-- `SO2`: Annual mean SO2 concentration
+-   BIO1 = Annual Mean Temperature
+-   BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))
+-   BIO3 = Isothermality (BIO2/BIO7) (\* 100)
+-   BIO4 = Temperature Seasonality (standard deviation \*100)
+-   BIO5 = Max Temperature of Warmest Month
+-   BIO6 = Min Temperature of Coldest Month
+-   BIO7 = Temperature Annual Range (BIO5-BIO6)
+-   BIO8 = Mean Temperature of Wettest Quarter
+-   BIO9 = Mean Temperature of Driest Quarter
+-   BIO10 = Mean Temperature of Warmest Quarter
+-   BIO11 = Mean Temperature of Coldest Quarter
+-   BIO12 = Annual Precipitation
+-   BIO13 = Precipitation of Wettest Month
+-   BIO14 = Precipitation of Driest Month
+-   BIO15 = Precipitation Seasonality (Coefficient of Variation)
+-   BIO16 = Precipitation of Wettest Quarter
+-   BIO17 = Precipitation of Driest Quarter
+-   BIO18 = Precipitation of Warmest Quarter
+-   BIO19 = Precipitation of Coldest Quarter
