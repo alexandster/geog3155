@@ -27,9 +27,9 @@ set.seed(42)
 
 For the next few labs, we'll be looking at deep learning models. As these are computationally costly models, they are generally built using specialized software to make them as efficient as possible. The full software stack is a little complicated, but in short, it consists of:
 
--   The backend deep learning software. This includes **tensorflow**, **torch** and **jax**.
--   The **keras** API. This is written in Python and tries to act as a unified interface to the different types of software
--   The R **keras3** package. This uses the **reticulate** package to call **keras** functions from R
+- The backend deep learning software. This includes **tensorflow**, **torch** and **jax**.
+- The **keras** API. This is written in Python and tries to act as a unified interface to the different types of software
+- The R **keras3** package. This uses the **reticulate** package to call **keras** functions from R
 
 If at this point, this seems excessively complicated, well, it is. But there is a reason for this, which is to allow a great amount of flexibility. If you want to develop very complex models, you can work directly with the deep learning package. If you need only to use standard functions, then you can use **keras**. And if you want to use R as the front-end to all of this, you can do that too.
 
@@ -37,10 +37,10 @@ We'll mainly be using a combination of **keras3** and **tensorflow** in this cla
 
 ## Objectives
 
--   Set up **keras3** and **tensorflow** on your computer
--   Understand the basic operations in a neural network
--   Build a simple classification model using standard network layers
--   Train and evaluate this model
+- Set up **keras3** and **tensorflow** on your computer
+- Understand the basic operations in a neural network
+- Build a simple classification model using standard network layers
+- Train and evaluate this model
 
 # Installation
 
@@ -63,7 +63,7 @@ This should create a specific virtual environment called `r-keras`, and install 
 
 You can also change the name of the virtual environment as follows (this allows you to install different backends or versions in different environments). Don't worry about this step if the first installation went well
 
-``` {r eval="FALSE"}
+```{r eval="FALSE"}
 # library(reticulate)
 # virtualenv_create("r-keras", python=install_python())
 # library(keras3)
@@ -191,7 +191,7 @@ tf$matmul(x, W) + b
 
 The next step in the forward pass is to send the output of node (above) through an activation function. There are several of these, and the code below simply illustrates how they convert a vector of randomly generated values (`x`)
 
--   Linear activation
+- Linear activation
 
 ```{r}
 x <- as_tensor(seq(-3, 3, length.out = 100))
@@ -199,7 +199,7 @@ x_act <- activation_linear(x)
 plot(x, x_act, type = 'l')
 ```
 
--   Sigmoid activation. Note that this requires a second column of zeros added to it
+- Sigmoid activation. Note that this requires a second column of zeros added to it
 
 ```{r}
 xs <- layer_concatenate(list(x, 
@@ -208,7 +208,7 @@ x_act <- activation_sigmoid(xs)
 plot(x, x_act[1:length(x)], type = 'l')
 ```
 
--   ReLu activation. This is a widely used activation function in deep learning, which sets all output below zero to zero, and uses a linear transform for the values above 0
+- ReLu activation. This is a widely used activation function in deep learning, which sets all output below zero to zero, and uses a linear transform for the values above 0
 
 ```{r}
 x_act <- activation_relu(x)
@@ -260,7 +260,7 @@ $$
 \mbox{prediction} = W \times input + b
 $$
 
-This is trained to minimize the square of the difference between predictions and the targets. 
+This is trained to minimize the square of the difference between predictions and the targets.
 
 Next, we'll initialize values for `W` and `b`, using random values and with zeros, respectively.
 
@@ -329,13 +329,13 @@ inputs <- as_tensor(inputs, dtype = "float32")
  }
 ```
 
-Once trained, we can predict for each of the original observations and plot the predicted values. 
+Once trained, we can predict for each of the original observations and plot the predicted values.
 
 ```{r}
 model(inputs)
 ```
 
-As we didn't transform the output using a sigmoid activation function, the values are continuous and range between roughly 0 and 1. To get a binary prediction, we'll use a simple threshold of 0.5 (i.e. predictions above 0.5 are classed as `1`, below 0 as `0`). 
+As we didn't transform the output using a sigmoid activation function, the values are continuous and range between roughly 0 and 1. To get a binary prediction, we'll use a simple threshold of 0.5 (i.e. predictions above 0.5 are classed as `1`, below 0 as `0`).
 
 ```{r}
 predictions <- model(inputs)
@@ -500,9 +500,9 @@ metrics <- list(
 
 Next, we need to compile the model. This links the model to a specific optimizer, the loss function and any error metrics we want to calculate.
 
--   Optimizer: We'll use the standard backpropagation algorithm here (`rmsprop`), with a learning rate of 1e-4. This is controls the amount of update for each weight at each iteration. Other optimizers include `sgd` for stochastic gradient descent and `adam` for the Adam algorithm, both of which are useful for much larger, complex data
--   Loss function. Here, we'll use binary cross entropy. This is the standard loss function for binary outcomes (cross entropy is a measure of how different two distributions are, and this is well suited to a binary classification exercise, where we want to discriminate between 0's and 1's)
--   Metrics: we simply include the list we made earlier
+- Optimizer: We'll use the standard backpropagation algorithm here (`rmsprop`), with a learning rate of 1e-4. This is controls the amount of update for each weight at each iteration. Other optimizers include `sgd` for stochastic gradient descent and `adam` for the Adam algorithm, both of which are useful for much larger, complex data
+- Loss function. Here, we'll use binary cross entropy. This is the standard loss function for binary outcomes (cross entropy is a measure of how different two distributions are, and this is well suited to a binary classification exercise, where we want to discriminate between 0's and 1's)
+- Metrics: we simply include the list we made earlier
 
 ```{r}
 model |> compile(
@@ -514,11 +514,11 @@ model |> compile(
 
 Now we have everything in place, we can train the model. Here we specify:
 
--   the set of features for training (`train_features`)
--   the set of labels for training (`train_targets`)
--   the number of iterations to train the model for (`epochs`)
--   the `batch_size`.
--   the validation features and labels
+- the set of features for training (`train_features`)
+- the set of labels for training (`train_targets`)
+- the number of iterations to train the model for (`epochs`)
+- the `batch_size`.
+- the validation features and labels
 
 The batch size is quite an useful parameter to make your network more efficient. This is the number of samples to pass through the network before updating weights. This allows you to trade off the speed of the calculation against the convergence. Using smaller batches uses less memory but may take longer to converge, as the weights are being updated using only a fraction of the data. Larger batches will converge quickly, by may cause memory issues, and may more easily result in overfitting.
 
@@ -570,9 +570,9 @@ We get an accuracy of about 0.8, which is not bad for a first attempt. The next 
 
 For the exercise, you just need to make a new model for the credit score data. There are several things that you can try, including:
 
--   Adding more layers
--   Adding more nodes
--   Changing the learning rate, batch size or number of training epochs
+- Adding more layers
+- Adding more nodes
+- Changing the learning rate, batch size or number of training epochs
 
 Use a Quarto document to record the code describing the changes in your model setup. You should also re-train the model and make a new set of predictions for the test set, and report the accuracy. Assignments, to include both the Quarto document and (ideally) the compiled HTML file, should be submitted to Canvas. Please use the following naming convention: Lab07_lastname.
 
@@ -583,7 +583,7 @@ Use a Quarto document to record the code describing the changes in your model se
 *credit_data.csv*
 
 | Column header | Variable |
-|----------------|-------------------------------------------------------|
+|----|----|
 | `Status` | whether the customer managed to pay back the loan (0) or not (1) |
 | `Seniority` | job experience in years |
 | `Home` | type of homeownership: renting (1), a homeowner (2), and others |

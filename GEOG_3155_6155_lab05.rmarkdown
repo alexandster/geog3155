@@ -1,8 +1,8 @@
 ---
-title: "GEOG 5160 6160 Preprocessing examples"
+title: "GEOG 3155 6155 ML Preprocessing"
 author: 
-  - name: "Simon Brewer"
-    email: simon.brewer@ess.utah.edu
+  - name: "Alexander Hohl"
+    email: alexander.hohl@ess.utah.edu
     affiliations:
       - name: University of Utah
         address: 260 S Central Campus Drive
@@ -25,7 +25,7 @@ set.seed(42)
 
 # Introduction
 
-This lab document covers a series of 'additional' topics in machine learning, mainly focused on preprocessing techniques. Although we will spend most of this semester looking at different algorithms, you will find that data manipulation makes up a significant part of any project, so some of these methods will likely be of use in your projects. 
+This lab document covers a series machine learning preprocessing techniques. Although we will spend most of this semester looking at different algorithms, you will find that data manipulation makes up a significant part of any project, so some of these methods will likely be of use in your projects.
 
 We'll cover the following subjects:
 
@@ -96,7 +96,7 @@ left_skew_exp = exp(left_skew)
 
 ### Standardization and normalization
 
-For some algorithms, having very different ranges for features (e.g. one feature in 0-1 and another in 0-1000000), can results in biases, where more attention is paid to the larger magnitude feature. These two approaches are ways to transform variables by rescaling them, with the goal of ensuring that all features have the same (or approximately) the same range. 
+For some algorithms, having very different ranges for features (e.g. one feature in 0-1 and another in 0-1000000), can results in biases, where more attention is paid to the larger magnitude feature. These two approaches are ways to transform variables by rescaling them, with the goal of ensuring that all features have the same (or approximately) the same range.
 
 We'll load some example data to demonstrate this (and other steps) with the tidymodels setup. We'll use the column called `Status` as the target, and all other columns as features. Load the data and create the basic recipe to set the relationship between variables:
 
@@ -111,12 +111,11 @@ rec_obj
 
 #### Standardization
 
-Standardizing features converts them into $z$-scores by subtracting the mean and dividing by the standard deviation:
-$$
+Standardizing features converts them into $z$-scores by subtracting the mean and dividing by the standard deviation: $$
 z_i = (x_i - \bar{x}) / \sigma_x
 $$
 
-This has some attractive properties: it rescales all features to the same range; a value of 0 is equal to the mean; and values of -1 and 1 equal 1 s.d. below or above the mean, respectively, for all features. 
+This has some attractive properties: it rescales all features to the same range; a value of 0 is equal to the mean; and values of -1 and 1 equal 1 s.d. below or above the mean, respectively, for all features.
 
 We'll now add the steps to standardize to the original recipe
 
@@ -140,7 +139,7 @@ credit_data_std <- bake(final_rec, credit_data)
 summary(credit_data_std)
 ```
 
-If you look at the numerical variables, you should see that they are transformed to have a mean of zero and standard deviation of 1. 
+If you look at the numerical variables, you should see that they are transformed to have a mean of zero and standard deviation of 1.
 
 #### Normalization
 
@@ -167,8 +166,7 @@ To see what this looks like, we'll print a set of rows from the data (look in th
 credit_data[150:160,]
 ```
 
-
-We'll now try to impute these (and other missing values). The **recipes** package has a number of function, so we'll just demonstrate a few. 
+We'll now try to impute these (and other missing values). The **recipes** package has a number of function, so we'll just demonstrate a few.
 
 ### Simple imputation
 
@@ -178,7 +176,7 @@ We'll start with simple imputation. This replaces the missing values with a cons
 mean(credit_data$Income, na.rm = TRUE)
 ```
 
-Now we'll impute. As before, we'll work from the basic recipe (`rec_obj`) that defines relationships between the variables. 
+Now we'll impute. As before, we'll work from the basic recipe (`rec_obj`) that defines relationships between the variables.
 
 ```{r}
 impute <- rec_obj |> 
@@ -265,7 +263,7 @@ credit_data_1[30, ]
 
 ## PCA transformation
 
-Another useful transformation of data is through a principal component transformation. This is a commonly used form of dimension reduction, that can often reduce datasets with large numbers of features down to a small number of principal components. In addition, as PCA is based on the co-variation between features, it can avoid issues of multicollinearity or redundancy with features that record similar real world factors. We'll look at this here with a breast cancer dataset, which has a relatively large number of features (30). 
+Another useful transformation of data is through a principal component transformation. This is a commonly used form of dimension reduction, that can often reduce datasets with large numbers of features down to a small number of principal components. In addition, as PCA is based on the co-variation between features, it can avoid issues of multicollinearity or redundancy with features that record similar real world factors. We'll look at this here with a breast cancer dataset, which has a relatively large number of features (30).
 
 ```{r}
 df <- read.csv("./datafiles/breast_cancer_data.csv")
@@ -276,7 +274,7 @@ Next, we'll remove some superflous columns and convert the outcome to a factor:
 
 ```{r}
 df <- df |>
-  select(-id, -X) |>
+  #select(-id, -X) |>
   mutate(diagnosis = as.factor(diagnosis))
 ```
 
@@ -360,7 +358,7 @@ pred_test |>
   bal_accuracy(diagnosis, .pred_class)
 ```
 
-And we see very little change in the accuracy. If you take a quick look at each fitted model (just type model name e.g. `log_mod_fit`), you will see a difference in the complexity. The first model as 30 coefficients for all the features, the second only has two, but with no loss in predictive skill. 
+And we see very little change in the accuracy. If you take a quick look at each fitted model (just type model name e.g. `log_mod_fit`), you will see a difference in the complexity. The first model as 30 coefficients for all the features, the second only has two, but with no loss in predictive skill.
 
 How do you know how many components to use? PCA can return as many summary features as original features, but of rapidly diminishing utility. A simple way to check is to independently run a PCA using R's `prcomp` function:
 
@@ -372,7 +370,7 @@ df_pca <- df_train |>
 summary(df_pca)
 ```
 
-If you look at the bottom row if this output, it will show you the cumulative amount of variance as we increase the number of components. In this case, as we used the first two components, these account for about 63% of the original variance. 
+If you look at the bottom row if this output, it will show you the cumulative amount of variance as we increase the number of components. In this case, as we used the first two components, these account for about 63% of the original variance.
 
 ## Feature selection
 
@@ -390,7 +388,7 @@ This approach does pairwise comparisons of each feature with the target using an
 library(important)
 ```
 
-We'll set this up first to use the $F$-statistic from an ANOVA performed between each feature and the target. Features with low values will be excluded, and we use `prop_terms` to define the proportion of features to remove. 
+We'll set this up first to use the $F$-statistic from an ANOVA performed between each feature and the target. Features with low values will be excluded, and we use `prop_terms` to define the proportion of features to remove.
 
 ```{r}
 rec_obj <- recipe(diagnosis ~ ., data = df_train) |>
@@ -426,12 +424,13 @@ names(df_sel)
 library(Boruta)
 ```
 
-We can just run this on the original data (`df`). 
+We can just run this on the original data (`df`).
 
 ```{r}
 df_bor = Boruta(diagnosis ~ ., df)
 df_bor
 ```
+
 For this dataset, no features were rejected, but two were deemed to be 'tentative' - running the method with more iterations may solve this. We can now get the selected features into a new set as follows (this is a bit tricky as we have keep the target column)
 
 ```{r}
@@ -449,7 +448,7 @@ Next, we'll look at ways to work with imbalanced data. This generally refers to 
 - Model training: loss function is dominated by majority class
 - Model evaluation: performance for minority class is under-represented
 
-There are a range of different approaches for dealing with this, but these largely can be split into weighting methods and sampling methods. 
+There are a range of different approaches for dealing with this, but these largely can be split into weighting methods and sampling methods.
 
 Next we'll load some imbalanced data (this is a data set of credit applications, with the final column indicating whether an application was rejected (`yes`) or not). We'll do some cleaning, then split into training and testing. We'll then set up an initial recipe with scaling and one-hot encoding.
 
@@ -460,7 +459,7 @@ head(df)
 
 ```{r}
 df = df |>
-  select(-day, -month) |>
+  #select(-day, -month) |>
   mutate(y = as.factor(y))
 
 train_test_split <- initial_split(df, prop = 0.8)
@@ -516,7 +515,7 @@ Note that although the accuracy looks great, the balanced accuracy of 0.65 refle
 
 ### Resampling
 
-In this approach, we resample the data in way that makes the number of the minority and majority class match. we need an additional library **themis** to run these functions. 
+In this approach, we resample the data in way that makes the number of the minority and majority class match. we need an additional library **themis** to run these functions.
 
 ```{r}
 library(themis)
@@ -525,7 +524,6 @@ library(themis)
 #### Random oversampling
 
 Here, the minority dataset is sampled *with replacement* to create a datasubset that is the same size as the majority set. To demonstrate this, we'll simply add this as an extra step, prep and bake it and count the number of `no`s and `yes`s in the returned data:
-
 
 ```{r}
 rec_obj |>
@@ -655,7 +653,7 @@ Next, we'll try to weight the dataset. One of the simplest approaches to this is
 df = read.csv("./datafiles/bank-full.csv", sep=";")
 
 df = df |>
-  select(-day, -month) |>
+  #select(-day, -month) |>
   mutate(y = as.factor(y),
          case_wts = ifelse(y == "no", 1, 1/0.13),
          case_wts = importance_weights(case_wts)
