@@ -48,8 +48,8 @@ Over the course of the semester, you will develop your own Spatial Data Science 
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab05.ipynb)
   - [Lab notes (Python colab)](https://colab.research.google.com/drive/1aQa9VsSqM9xcl7VOvRkeTQ1kKKxrJuBk?usp=sharing)
 - Lab 6
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab06.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab06.ipynb)
+  - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab06.html)
+  - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab06.ipynb)
   - [Lab notes (Python colab)](https://colab.research.google.com/drive/1gXjnjgRxD-4X-haoWLc9G-a5MP-P96xj?usp=sharing)
 - Preprocessing lab
   - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Preprocessing_Examples.html)
