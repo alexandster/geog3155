@@ -458,7 +458,7 @@ tm_shape(cluster_sf) +
 
 # Exercise
 
-For the exercise, you will need to build use an unsupervised classification method with the Atlantic Cancer dataset (*data_atlantic_1998_2012.csv*). This file contains information on cancer rates from around 660 counties in the eastern part of the US. There is also a shapefile with the polygons for each county (*COUNTY_ATLANTIC.shp*).
+For the exercise, you will need to build use an unsupervised classification method with the Atlantic Cancer dataset ([*data_atlantic_1998_2012.csv*](https://github.com/alexandster/geog3155/blob/main/datafiles/data_atlantic_1998_2012.csv "https://github.com/alexandster/geog3155/blob/main/datafiles/data_atlantic_1998_2012.csv")). This file contains information on cancer rates from around 660 counties in the eastern part of the US. There is also a shapefile with the polygons for each county ([*COUNTY_ATLANTIC.shp*](https://github.com/alexandster/geog3155/tree/main/datafiles/COUNTY_ATLANTIC "https://github.com/alexandster/geog3155/tree/main/datafiles/COUNTY_ATLANTIC")).
 
 For the exercise, you will need to cluster these data and map out the resulting clusters. You will need to carry out the following steps:
 
@@ -468,7 +468,7 @@ For the exercise, you will need to cluster these data and map out the resulting 
 - Extract the cluster number for each county and add it to the shapefile
 - Make a map of the clusters
 
-Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and the compiled HTML file (or the Pyhton Notebook), should be submitted to Canvas. Please use the following naming convention: `Lab06_lastname`.
+Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and the compiled HTML, should be submitted to Canvas. Please use the following naming convention: `Lab06_lastname`.
 
 # Appendix
 
