@@ -467,6 +467,7 @@ For the exercise, you will need to cluster these data and map out the resulting 
 - Cluster the data using *either* $k$-means *or* a self-organizing map
 - Extract the cluster number for each county and add it to the shapefile
 - Make a map of the clusters
+- GEOG 6155 students only: Make a table showing the average values of each variable in each cluster
 
 Use a Quarto document to record your answers and output. Assignments, to include both the Quarto document and the compiled HTML, should be submitted to Canvas. Please use the following naming convention: `Lab06_lastname`.
 

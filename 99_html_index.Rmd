@@ -28,55 +28,37 @@ Over the course of the semester, you will develop your own Spatial Data Science 
 # Classes
 
 - Lab 1
+
   - [Installation instructions](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Installation.html)
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab01.html)
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab01.ipynb)
   - [Lab notes (Python colab)](https://colab.research.google.com/drive/1_GMhuHQDQMWpFJLETYfAz3moQ9E3pqIS?usp=sharing)
+
 - Lab 2
+
   - [Lab notes (R) Part 1](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab02_part1.html)
   - [Lab notes (R) Part 2](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab02_part2.html)
+
 - Lab 3
+
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab03.html)
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab03.ipynb)
   - [Lab notes (Python colab)](https://colab.research.google.com/drive/1UxVwNIHiop2P5mWlIxWwY2HY9_8wE8_y?usp=sharing)
+
 - Lab 4
+
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab04.html)
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab04.ipynb)
   - [Lab notes (Python colab)](https://drive.google.com/file/d/1fGI8A-w4k26cLuIlSalR1NGCxBpbkDYc/view?usp=sharing)
+
 - Lab 5
+
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab05.html)
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab05.ipynb)
   - [Lab notes (Python colab)](https://colab.research.google.com/drive/1aQa9VsSqM9xcl7VOvRkeTQ1kKKxrJuBk?usp=sharing)
+
 - Lab 6
+
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab06.html)
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab06.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1gXjnjgRxD-4X-haoWLc9G-a5MP-P96xj?usp=sharing)
-- Preprocessing lab
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_Preprocessing_Examples.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_Preprocessing_Examples.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1UW5Hk2dyk_gMSTh5D7Q5_ttVHu2Kjort?usp=sharing)
-- Lab 7
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab07.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab07.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1Pjedvyh7aGc1NL6b1aRkUTfYRgyA0NyV?usp=sharing)
-- Lab 8
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab08.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab08.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1gLwg6nTJ-mtKvp3nti1gyAUk1ZQQs1ob?usp=sharing)
-- Lab 9
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab09.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab09.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1mw2JOBrI80qA6e4Zs-REP7BZBjiEyhFK?usp=sharing)
-- Lab 10
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab10.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab10.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1pIZrXAqV-YeHx_EvWx-Y6J9EO5X7F6jA?usp=sharing)
-- [CNN assignment](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_CNN_assignment_08.html)
-- Lab 11
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab11.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab11.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1EOC11JasR03aJBvDz-ohoDfftR3TPm6u?usp=sharing)
-- Lab 12
-  - [Lab notes (R)](https://simonbrewer.github.io/geog5160/GEOG_5160_6160_lab12.html)
-  - [Lab notes (Python notebook)](https://github.com/simonbrewer/geog5160/blob/main/GEOG_5160_6160_lab12.ipynb)
-  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1QyZTtjJmfyS2vcuPac1fUTiuZWwXcgPa?usp=sharing)
+  - [Lab notes (Python colab)](https://colab.research.google.com/drive/1_3cKAFrk7bFDtGilsi-AqArId8roaj_o?usp=sharing "https://colab.research.google.com/drive/1_3cKAFrk7bFDtGilsi-AqArId8roaj_o?usp=sharing")
