@@ -66,7 +66,5 @@ Over the course of the semester, you will develop your own Spatial Data Science 
 - Lab 7
 
   - [Lab notes (R)](https://alexandster.github.io/geog3155/docs/GEOG_3155_6155_lab07.html)
-
   - [Lab notes (Python notebook)](https://github.com/alexandster/geog3155/blob/main/GEOG_3155_6155_lab07.ipynb)
-
   - Lab notes (Python colab)
